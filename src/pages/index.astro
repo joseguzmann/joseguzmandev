@@ -1,0 +1,102 @@
+---
+// Home de joseguzman.dev. Diseño elegido por Jose el 2026-10-08: la preview 15
+// (Pipeline · AI Engineer), con la experiencia antes de la actividad de GitHub.
+import '../styles/pv-dark.css';
+import RunHistory from '../components/pv/RunHistory.astro';
+import ProcessRun from '../components/pv/ProcessRun.astro';
+import Artifacts from '../components/pv/Artifacts.astro';
+import ContribGraph from '../components/pv/ContribGraph.astro';
+import ProfileFacts from '../components/pv/ProfileFacts.astro';
+import { kit, profile } from '../data/preview-kit';
+
+const title = `${kit.name} — ${profile.title}`;
+const description = `${profile.headline} ${profile.sub}`;
+const canonical = new URL('/', Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0d1117" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="pv-top">
+      <div class="wrap bar">
+        <p class="repo"><span class="av" aria-hidden="true">JG</span>jose-guzman <span class="dim">/</span> <strong>ai-engineer</strong></p>
+        <nav aria-label="Sections"><a href="#experience">Experience</a><a href="#activity">Activity</a><a href="#systems">Systems</a><a href="#skills">Skills</a></nav>
+        <a class="btn sm" href={kit.ctaHref}>{kit.cta}</a>
+      </div>
+    </header>
+
+    <main id="main" class="wrap">
+      <section class="pv-hero">
+        <p class="eyebrow">{profile.title} · {profile.location} · {profile.open}</p>
+        <h1 class="h1-long">{profile.headline}</h1>
+        <p class="sub">{profile.sub}</p>
+        <div class="row">
+          <a class="btn" href={kit.ctaHref}>{kit.cta} <span aria-hidden="true">→</span></a>
+          <a class="ghost" href="https://github.com/joseguzmann">GitHub ↗</a>
+        </div>
+      </section>
+
+      <section id="experience" class="block" aria-labelledby="ex-h">
+        <div class="block-h"><h2 id="ex-h">Experience</h2><p class="small mono">open a role to see what I built there</p></div>
+        <RunHistory openOrg="Agents Booster" />
+      </section>
+
+      <section id="activity" class="block" aria-labelledby="ac-h">
+        <div class="block-h"><h2 id="ac-h">Activity</h2></div>
+        <ContribGraph />
+      </section>
+
+      <section id="systems" class="block" aria-labelledby="sy-h">
+        <div class="block-h"><h2 id="sy-h">Systems I built</h2></div>
+        <Artifacts />
+      </section>
+
+      <section class="block" aria-label="How I work">
+        <ProcessRun log={false} />
+      </section>
+
+      <section id="skills" class="block" aria-labelledby="sk-h">
+        <div class="block-h"><h2 id="sk-h">Skills</h2></div>
+        <ProfileFacts />
+      </section>
+
+      <section class="cta-box">
+        <div>
+          <p class="eyebrow">{profile.open.toLowerCase()}</p>
+          <h2>Building agents that have to hold up in production?</h2>
+          <p class="sub">AI and backend engineering roles, or a system you need built and run.</p>
+        </div>
+        <a class="btn" href={kit.ctaHref}>{kit.cta} <span aria-hidden="true">→</span></a>
+      </section>
+    </main>
+
+    <footer class="wrap pv-foot">
+      <span>© {new Date().getFullYear()} {kit.name}</span>
+      <span><a href={kit.ctaHref} rel="me">LinkedIn</a> · <a href="https://github.com/joseguzmann" rel="me">GitHub</a></span>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .h1-long { font-size: clamp(32px, 4.6vw, 54px); max-width: 22ch; letter-spacing: -0.035em; line-height: 1.05; }
+  .skip { position: absolute; left: 16px; top: -60px; z-index: 50; background: var(--fg); color: var(--canvas); padding: 8px 12px; border-radius: 6px; }
+  .skip:focus { top: 10px; }
+  body { padding-bottom: 40px; }
+  .pv-foot a { color: var(--mute); }
+  .pv-foot a:hover { color: var(--fg); }
+</style>

@@ -1,0 +1,124 @@
+---
+// La carrera como una traza (patrones de Jaeger UI, Apache-2.0, © 2017 Uber Technologies:
+// cabecera de traza, minimapa, regla de tiempo, barras en % del rango, etiqueta de duración).
+// Con `select`, cada fila es un radio: la página muestra el panel del span elegido con :has().
+import { kit, orgColor } from '../../data/preview-kit';
+import { mi, fmt, label, duration, axisStart, axisEnd, axisLen, axisYears, chrono } from '../../data/preview-dates';
+
+interface Props {
+  /** Prefijo de ids y nombre del grupo de radios; vacío = traza sin selección. */
+  select?: string;
+  /** Índice (en orden cronológico) del span elegido al cargar. */
+  initial?: number;
+  title?: string;
+}
+
+const { select = '', initial = 0, title = 'career' } = Astro.props;
+const roles = chrono;
+const pos = (m: number) => ((m - axisStart) / axisLen) * 100;
+const wid = (s: string, e: string | null) => ((mi(e ?? kit.asOf) - mi(s) + 1) / axisLen) * 100;
+const orgs = new Set(roles.map((r) => r.org)).size;
+const first = roles[0].start;
+---
+
+<div class="trace">
+  <div class="th">
+    <p class="tt"><span class="mono dim">trace</span> <strong>{title}</strong></p>
+    <dl class="mono">
+      <div><dt>Start</dt><dd>{fmt(first)}</dd></div>
+      <div><dt>Duration</dt><dd>{duration(first, null)}</dd></div>
+      <div><dt>Services</dt><dd>{orgs}</dd></div>
+      <div><dt>Spans</dt><dd>{roles.length}</dd></div>
+    </dl>
+  </div>
+
+  <div class="mini" aria-hidden="true">
+    {roles.map((r) => <span style={`left:${pos(mi(r.start))}%;width:${wid(r.start, r.end)}%;background:${orgColor[r.org]}`}></span>)}
+  </div>
+
+  <div class="ruler mono" aria-hidden="true">
+    <span class="nc">Service · operation</span>
+    <span class="tc">
+      {axisYears.map((y) => <i style={`left:${pos(Math.max(y * 12, axisStart))}%`}>{y}</i>)}
+      <i class="end">{label(axisEnd)}</i>
+    </span>
+  </div>
+
+  <ol class="rows" aria-label={select ? 'Roles — pick one to see its details' : 'Roles'}>
+    {roles.map((r, i) => {
+      const left = pos(mi(r.start));
+      const w = wid(r.start, r.end);
+      const flip = left + w > 78;
+      const inner = (
+        <>
+          <span class="nc">
+            <i class="sw" style={`background:${orgColor[r.org]}`} aria-hidden="true"></i>
+            <span class="nm"><strong>{r.org}</strong> <span class="dim">{r.role}</span></span>
+          </span>
+          <span class="tc">
+            {axisYears.map((y) => <i class="grid" style={`left:${pos(Math.max(y * 12, axisStart))}%`} aria-hidden="true"></i>)}
+            <span class:list={['bar', { open: r.end === null }]} style={`left:${left}%;width:${w}%;--c:${orgColor[r.org]}`}></span>
+            <span class:list={['dur', 'mono', { flip }]} style={flip ? `right:${100 - left}%` : `left:${left + w}%`}>{duration(r.start, r.end)}</span>
+          </span>
+        </>
+      );
+      return select ? (
+        <li class="row sel">
+          <input class="sr" type="radio" name={select} id={`${select}-${i}`} checked={i === initial} />
+          <label for={`${select}-${i}`} class="hit">{inner}<span class="sr"> · {fmt(r.start)} – {fmt(r.end)}</span></label>
+        </li>
+      ) : (
+        <li class="row">{inner}</li>
+      );
+    })}
+  </ol>
+</div>
+
+<style>
+  .trace { --nc: 300px; }
+  .th { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 24px; padding: 16px 18px; border-bottom: 1px solid var(--line-2); }
+  .tt { font-size: 16px; }
+  .th dl { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 12px; }
+  .th dt { color: var(--mute); display: inline; margin-right: 6px; }
+  .th dd { display: inline; color: var(--fg); }
+  .mini { position: relative; height: 34px; margin: 12px 18px; background: var(--inset); border: 1px solid var(--line-2); border-radius: 6px; overflow: hidden; }
+  .mini span { position: absolute; height: 4px; top: 50%; border-radius: 2px; opacity: .85; }
+  .mini span:nth-child(odd) { transform: translateY(-6px); }
+  .mini span:nth-child(even) { transform: translateY(4px); }
+  .ruler { display: grid; grid-template-columns: var(--nc) 1fr; font-size: 11px; color: var(--mute); border-block: 1px solid var(--line-2); background: var(--inset); }
+  .ruler .nc { padding: 7px 18px; }
+  .ruler .tc { position: relative; }
+  .ruler i { position: absolute; top: 7px; font-style: normal; transform: translateX(5px); }
+  .ruler i.end { right: 8px; transform: none; }
+  .row { border-bottom: 1px solid var(--line-2); }
+  .row:last-child { border-bottom: 0; }
+  .row > .nc, .hit { display: grid; grid-template-columns: var(--nc) 1fr; align-items: center; min-height: 46px; }
+  .row:not(.sel) { display: grid; grid-template-columns: var(--nc) 1fr; align-items: center; min-height: 46px; }
+  .sel { display: block; }
+  .hit { cursor: pointer; width: 100%; }
+  .row:hover { background: var(--raise); }
+  .sel:has(input:checked) { background: rgb(68 147 248 / .08); box-shadow: inset 3px 0 0 var(--accent); }
+  .sel:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .nc { display: flex; align-items: center; gap: 10px; padding: 0 18px; min-width: 0; }
+  .sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .nm { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tc { position: relative; height: 46px; }
+  .grid { position: absolute; top: 0; bottom: 0; border-left: 1px solid var(--line-2); }
+  .bar { position: absolute; top: 15px; height: 16px; border-radius: 3px; background: var(--c); min-width: 4px; }
+  .bar.open { border-radius: 3px 0 0 3px; background: linear-gradient(90deg, var(--c) 80%, color-mix(in srgb, var(--c) 35%, transparent)); }
+  .dur { position: absolute; top: 14px; font-size: 11px; color: var(--mute); padding: 0 8px; white-space: nowrap; }
+
+  @media (max-width: 760px) {
+    .trace { --nc: 1fr; }
+    .ruler { grid-template-columns: 1fr; }
+    .ruler .nc { display: none; }
+    .ruler .tc { height: 26px; }
+    .ruler i.end { display: none; }
+    .row > .nc, .hit, .row:not(.sel) { grid-template-columns: 1fr; padding-top: 8px; }
+    .nm { white-space: normal; }
+    .tc { height: 30px; margin: 0 4px; }
+    .bar { top: 6px; height: 12px; }
+    .dur { top: 5px; }
+    .mini { margin: 10px 12px; }
+  }
+</style>

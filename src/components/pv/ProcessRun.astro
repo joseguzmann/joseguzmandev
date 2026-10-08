@@ -1,0 +1,77 @@
+---
+// "How a project runs": los cuatro pasos de src/data/home.ts como jobs de un workflow (de la 10/14).
+import { kit } from '../../data/preview-kit';
+import { process } from '../../data/home';
+
+interface Props {
+  log?: boolean;
+}
+const { log = true } = Astro.props;
+---
+
+<section class="run" aria-labelledby="run-h">
+  <div class="run-head">
+    <div class="title">
+      <span class="ok-ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="16" height="16"><path d="M13.3 4.3 6.5 11.1 2.7 7.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <div>
+        <h2 id="run-h">How a project runs</h2>
+        <p class="mono small">deliver.yml · on: your first message</p>
+      </div>
+    </div>
+    <dl class="summary mono">
+      <div><dt>Jobs</dt><dd>{process.length}</dd></div>
+      <div><dt>Artifacts</dt><dd>{kit.work.length}</dd></div>
+      <div><dt>Owner</dt><dd>José, end to end</dd></div>
+    </dl>
+  </div>
+  <ol class="graph">
+    {process.map((p, i) => (
+      <li class="job">
+        <div class="job-top">
+          <span class="check" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12"><path d="M13 4.5 6.5 11 3 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <h3 class="mono">{String(i + 1).padStart(2, '0')} · {p.title.toLowerCase()}</h3>
+        </div>
+        <p>{p.body}</p>
+      </li>
+    ))}
+  </ol>
+  {log && (
+    <div class="log mono" aria-label="Job log">
+      <p class="log-h"><span>run</span><span class="small">output</span></p>
+      {process.map((p, i) => (
+        <p class="ln"><span class="n" aria-hidden="true">{i + 1}</span><span class="ok">✓</span> {p.title.toLowerCase()} <span class="dim">— {p.body.split('.')[0]}.</span></p>
+      ))}
+    </div>
+  )}
+</section>
+
+<style>
+  .run { border: 1px solid var(--line); border-radius: 12px; background: var(--subtle); overflow: hidden; }
+  .run-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px 24px; padding: 18px 20px; border-bottom: 1px solid var(--line-2); }
+  .title { display: flex; align-items: center; gap: 12px; }
+  .ok-ico { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: rgb(63 185 80 / .15); color: var(--ok); }
+  .run-head h2 { font-size: 18px; font-weight: 650; }
+  .summary { display: flex; gap: 24px; flex-wrap: wrap; font-size: 12px; }
+  .summary dt { color: var(--mute); }
+  .summary dd { color: var(--fg); font-size: 13px; }
+  .graph { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; padding: 32px 24px; background-image: radial-gradient(rgb(145 152 161 / .18) 1px, transparent 1px); background-size: 16px 16px; }
+  .job { position: relative; background: var(--canvas); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 8px; align-content: start; transition: border-color .15s; }
+  .job:hover { border-color: var(--ok); }
+  .job + .job::before { content: ''; position: absolute; left: -33px; top: 26px; width: 32px; border-top: 2px solid var(--line); }
+  .job + .job::after { content: ''; position: absolute; left: -6px; top: 22px; width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+  .job-top { display: flex; align-items: center; gap: 10px; }
+  .check { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--ok-em); color: #fff; flex: none; }
+  .job h3 { font-size: 14px; font-weight: 500; }
+  .job p { font-size: 14px; color: var(--mute); }
+  .log { background: var(--inset); border-top: 1px solid var(--line-2); padding: 14px 20px 18px; font-size: 13px; }
+  .log-h { display: flex; justify-content: space-between; color: var(--fg); padding-bottom: 8px; }
+  .ln { display: flex; gap: 12px; padding: 2px 0; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ln .n { color: #6e7681; width: 14px; text-align: right; flex: none; user-select: none; }
+  .ln .ok { color: var(--ok); }
+  @media (max-width: 860px) {
+    .graph { grid-template-columns: 1fr; gap: 20px; padding: 20px 16px; }
+    .job + .job::before { left: 26px; top: -21px; width: 0; height: 20px; border-top: 0; border-left: 2px solid var(--line); }
+    .job + .job::after { left: 23px; top: -6px; }
+  }
+  @media (max-width: 640px) { .ln .dim { display: none; } }
+</style>

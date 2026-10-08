@@ -1,0 +1,41 @@
+---
+export type Status = 'running' | 'shipped' | 'in-progress';
+
+interface Props {
+  status: Status;
+  text: string;
+}
+
+const { status, text } = Astro.props;
+// Sólo se anuncia lo que el punto agrega; "shipped" ya lo dice el texto.
+const names: Record<Status, string | null> = {
+  running: 'Running in production',
+  shipped: null,
+  'in-progress': 'In progress',
+};
+---
+
+<p class:list={['status', 'data', status]}>
+  <span class="dot" aria-hidden="true"></span>
+  {names[status] && <span class="sr-only">{names[status]}: </span>}{text}
+</p>
+
+<style>
+  .status { display: inline-flex; align-items: baseline; gap: 10px; color: var(--muted); }
+  .dot {
+    position: relative; flex: none; top: 1px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--faint);
+  }
+  .running .dot { background: var(--signal); }
+  .running .dot::after {
+    content: ''; position: absolute; inset: -4px; border-radius: 50%;
+    border: 1px solid var(--signal);
+    animation: breathe 2.8s ease-out infinite;
+  }
+  .in-progress .dot { background: transparent; border: 1.5px solid var(--muted); }
+  @keyframes breathe {
+    0% { transform: scale(.6); opacity: .9; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+</style>

@@ -1,0 +1,29 @@
+---
+import '../styles/pv-dark.css';
+import { kit } from '../data/preview-kit';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Not found — {kit.name}</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <main class="wrap nf">
+      <p class="mono small">404 · span not found</p>
+      <h1>This page isn’t running.</h1>
+      <p class="sub">The link may be old. The rest of the site is still up.</p>
+      <a class="btn" href="/">Back to the home page <span aria-hidden="true">→</span></a>
+    </main>
+  </body>
+</html>
+
+<style>
+  .nf { min-height: 80vh; display: grid; align-content: center; gap: 16px; }
+  h1 { font-size: clamp(36px, 6vw, 60px); letter-spacing: -0.04em; line-height: 1.05; }
+</style>

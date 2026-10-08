@@ -1,0 +1,90 @@
+---
+// "How it connects" para un rol: la empresa a la izquierda, lo que hizo ahí a la derecha,
+// unidos por aristas bezier (patrón visual de React Flow / xyflow, MIT). Layout calculado acá.
+import { highlights, orgColor } from '../../data/preview-kit';
+import { fmt, duration } from '../../data/preview-dates';
+import { caseHref } from '../../data/case-links';
+
+interface Props {
+  role: { org: string; role: string; start: string; end: string | null; note: string };
+  /** Oculta el nodo de origen cuando el contexto ya lo muestra (p.ej. un panel de detalle). */
+  hideSource?: boolean;
+}
+
+const { role, hideSource = false } = Astro.props;
+const items = highlights[`${role.org}|${role.role}`] ?? [];
+const c = orgColor[role.org] ?? '#4493f8';
+const NODE = 76, GAP = 12, EW = 96;
+const H = items.length * NODE + Math.max(0, items.length - 1) * GAP;
+const ys = items.map((_, i) => i * (NODE + GAP) + NODE / 2);
+const live = role.end === null;
+---
+
+<div class:list={['rg', { 'no-src': hideSource }]} style={`--c:${c}; --h:${H}px`}>
+  {!hideSource && (
+    <article class="src">
+      <span class="hd r" aria-hidden="true"></span>
+      <p class="org"><i aria-hidden="true"></i>{role.org}</p>
+      <h4>{role.role}</h4>
+      <p class="mono small">{fmt(role.start)} – {fmt(role.end)} · {duration(role.start, role.end)}</p>
+      <p class="small note">{role.note}</p>
+    </article>
+  )}
+  <svg class="edges" width={EW} height={H} viewBox={`0 0 ${EW} ${H}`} aria-hidden="true">
+    {hideSource && <circle cx="5" cy={H / 2} r="5" class="anchor" />}
+    {ys.map((y) => (
+      <path d={`M0 ${H / 2} C${EW / 2} ${H / 2}, ${EW / 2} ${y}, ${EW} ${y}`} class:list={{ flow: live }} />
+    ))}
+  </svg>
+  <ul class="nodes" aria-label={`What I did at ${role.org}`}>
+    {items.map((h) => (
+      <li class="node">
+        <span class="hd l" aria-hidden="true"></span>
+        <div class="txt">
+          <p class="t" title={h.title}>{caseHref(h.href) ? <a href={caseHref(h.href)}>{h.title}</a> : h.title}</p>
+          <p class="d" title={h.detail}>{h.detail}</p>
+        </div>
+        {h.figure && <p class="fig mono">{h.figure}</p>}
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .rg { display: grid; grid-template-columns: minmax(220px, 300px) 96px minmax(0, 1fr); align-items: center; }
+  .rg.no-src { grid-template-columns: 96px minmax(0, 1fr); }
+  .src { position: relative; background: var(--raise); border: 1px solid var(--line); border-top: 3px solid var(--c); border-radius: 10px; padding: 14px 16px; display: grid; gap: 4px; }
+  .org { display: flex; align-items: center; gap: 8px; font: 500 12px var(--mono); color: var(--mute); text-transform: uppercase; letter-spacing: .06em; }
+  .org i { width: 8px; height: 8px; border-radius: 2px; background: var(--c); }
+  .src h4 { font-size: 16px; line-height: 1.3; }
+  .note { margin-top: 4px; }
+  .hd { position: absolute; width: 9px; height: 9px; border-radius: 50%; background: var(--canvas); border: 1.5px solid var(--c); }
+  .hd.r { right: -5px; top: calc(50% - 4.5px); }
+  .hd.l { left: -5px; top: calc(50% - 4.5px); }
+  .anchor { fill: var(--c); }
+  .edges { display: block; overflow: visible; }
+  .edges path { fill: none; stroke: var(--c); stroke-width: 1.6; opacity: .7; }
+  .edges path.flow { stroke-dasharray: 5 5; animation: flow 1.1s linear infinite; opacity: 1; }
+  @keyframes flow { to { stroke-dashoffset: -10; } }
+  .nodes { display: grid; gap: 12px; }
+  .node { position: relative; height: 76px; display: flex; align-items: center; gap: 14px; padding: 0 16px; background: var(--subtle); border: 1px solid var(--line); border-radius: 10px; transition: border-color .15s, background-color .15s; }
+  .node:hover { border-color: var(--c); background: var(--raise); }
+  .txt { min-width: 0; flex: 1; display: grid; gap: 2px; }
+  .t { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .t a { text-decoration: none; color: var(--accent); }
+  .t a::after { content: ''; position: absolute; inset: 0; border-radius: 10px; }
+  .t a:hover { text-decoration: underline; }
+  .d { font-size: 13px; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fig { flex: none; font-size: 12px; padding: 3px 9px; border-radius: 6px; color: var(--fg); background: color-mix(in srgb, var(--c) 18%, transparent); border: 1px solid color-mix(in srgb, var(--c) 45%, transparent); }
+
+  @media (max-width: 760px) {
+    .rg, .rg.no-src { grid-template-columns: 1fr; gap: 0; }
+    .edges, .hd { display: none; }
+    .nodes { margin-left: 14px; padding: 14px 0 0 16px; border-left: 2px solid var(--c); gap: 10px; }
+    .no-src .nodes { margin-left: 4px; padding-top: 0; }
+    .node { height: auto; min-height: 64px; padding: 12px 14px; flex-wrap: wrap; }
+    .node::before { content: ''; position: absolute; left: -17px; top: 50%; width: 15px; border-top: 2px solid var(--c); }
+    .t, .d { white-space: normal; }
+    .txt { flex-basis: 100%; }
+  }
+</style>
