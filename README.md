@@ -4,7 +4,8 @@ Source for my personal site.
 
 ## Stack
 
-Astro 7 · static output · deployed on Vercel. No client-side JavaScript; fonts are self-hosted.
+Astro 7 · static output · deployed on Vercel. The only client-side JavaScript is a few lines that
+highlight the current section in the nav; fonts are self-hosted.
 
 ## Develop
 
