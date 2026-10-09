@@ -26,11 +26,18 @@ const T: Record<string, { t: string; s: string; k: number; art: Art }> = {
   db: { t: 'Database', s: 'PostgreSQL · Redis · pgvector', k: -1, art: 'db' },
 };
 const n = (id: string, x: number, y: number, w: number, h: number): ArtNode => ({ id, x, y, w, h, ...T[id] });
+// Grilla alineada a los bordes del contenedor (= bordes del navbar): la fila de arriba toca los dos
+// lados, la caja de infra ocupa el mismo ancho y adentro todo va con el mismo margen.
+const W = 540, G = 18;
 const arch: ArtLayout = {
-  vb: [540, 370],
-  nodes: [n('web', 10, 16, 236, 58), n('mob', 280, 16, 236, 58), n('api', 46, 140, 236, 60), n('agt', 296, 140, 236, 60), n('db', 156, 264, 240, 58)],
+  vb: [W, 372],
+  nodes: [
+    n('web', 1, 14, 250, 58), n('mob', W - 251, 14, 250, 58),
+    n('api', 1 + G, 140, 240, 60), n('agt', W - 1 - G - 240, 140, 240, 60),
+    n('db', (W - 240) / 2, 264, 240, 58),
+  ],
   edges: [['web', 'api'], ['mob', 'api'], ['api', 'agt'], ['api', 'db'], ['agt', 'db', [3]]],
-  infra: { x: 28, y: 118, w: 510, h: 244, label: 'Docker · Linux · AWS · CI/CD' },
+  infra: { x: 1, y: 118, w: W - 2, h: 246, label: 'Docker · Linux · AWS · CI/CD' },
 };
 ---
 
