@@ -31,7 +31,7 @@ const canonical = new URL('/', Astro.site);
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
   </head>
-  <body>
+  <body id="top">
     <a class="skip" href="#main">Skip to content</a>
     <SiteHeader anim="cycle" />
 
@@ -88,7 +88,8 @@ const canonical = new URL('/', Astro.site);
 </html>
 
 <style>
-  main section[id] { scroll-margin-top: 80px; }
+  main section[id] { scroll-margin-top: 40px; }
+  #main { scroll-margin-top: 64px; }
   .h1-long { font-size: clamp(32px, 4.6vw, 54px); max-width: 22ch; letter-spacing: -0.035em; line-height: 1.05; }
   .skip { position: absolute; left: 16px; top: -60px; z-index: 50; background: var(--fg); color: var(--canvas); padding: 8px 12px; border-radius: 6px; }
   .skip:focus { top: 10px; }
