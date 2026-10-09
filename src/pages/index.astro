@@ -3,6 +3,7 @@
 // (Pipeline · AI Engineer), con la experiencia antes de la actividad de GitHub.
 import '../styles/pv-dark.css';
 import SiteHeader from '../components/SiteHeader.astro';
+import ArchDiagram, { type ArchLayout, type ArchNode } from '../components/pv/ArchDiagram.astro';
 import RunHistory from '../components/pv/RunHistory.astro';
 import ProcessRun from '../components/pv/ProcessRun.astro';
 import Artifacts from '../components/pv/Artifacts.astro';
@@ -11,8 +12,26 @@ import ProfileFacts from '../components/pv/ProfileFacts.astro';
 import { kit, profile } from '../data/preview-kit';
 
 const title = `${kit.name} — CS Engineer`;
-const description = `${profile.headline} ${profile.sub}`;
+const description = 'Software & AI Engineer in Quito, Ecuador. Web and mobile apps, backends in Python, Scala and TypeScript, and AI agents. Open to remote.';
 const canonical = new URL('/', Astro.site);
+const role = 'Software & AI Engineer';
+const words = ['frontends', 'mobile apps', 'backends', 'AI agents', 'infrastructure'];
+// Diagrama elegido el 2026-10-09 (ronda 6, opción B): web y mobile llaman al backend; el agente
+// trabaja con el backend y la base; todo corre sobre Docker · Linux · AWS · CI/CD.
+const T = {
+  web: { t: 'Web app', s: 'React · Angular · Vue', k: 0 },
+  mob: { t: 'Mobile app', s: 'React Native', k: 1 },
+  api: { t: 'Backend / API', s: 'Python · Scala · TypeScript', k: 2 },
+  agt: { t: 'AI agent', s: 'LangChain · LangGraph · RAG', k: 3 },
+  db: { t: 'Database', s: 'PostgreSQL · Redis · pgvector', k: -1 },
+};
+const n = (id: keyof typeof T, x: number, y: number, w = 200, h = 58): ArchNode => ({ id, x, y, w, h, ...T[id] });
+const arch: ArchLayout = {
+  vb: [520, 370],
+  nodes: [n('web', 20, 16), n('mob', 260, 16), n('api', 70, 140), n('agt', 300, 140), n('db', 180, 262, 212)],
+  edges: [['web', 'api'], ['mob', 'api'], ['api', 'agt'], ['api', 'db'], ['agt', 'db', [3]]],
+  infra: { x: 50, y: 118, w: 465, h: 244, label: 'Docker · Linux · AWS · CI/CD' },
+};
 ---
 
 <!doctype html>
@@ -36,14 +55,17 @@ const canonical = new URL('/', Astro.site);
     <SiteHeader anim="cycle" />
 
     <main id="main" class="wrap">
-      <section class="pv-hero">
-        <p class="eyebrow">{profile.title} · {profile.location} · {profile.open}</p>
-        <h1 class="h1-long">{profile.headline}</h1>
-        <p class="sub">{profile.sub}</p>
-        <div class="row">
-          <a class="btn" href={kit.ctaHref} target="_blank" rel="noopener noreferrer">{kit.cta} <span aria-hidden="true">→</span></a>
-          <a class="ghost" href="https://github.com/joseguzmann" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      <section class="pv-hero hero2">
+        <div class="hero-l">
+          <h1 class="name">{kit.name}</h1>
+          <p class="role">{role}</p>
+          <p class="rot"><span aria-hidden="true">I build</span><span class="words" aria-hidden="true">{words.map((w) => <span>{w}</span>)}</span><span class="sr">I build {words.join(', ')}.</span></p>
+          <div class="row">
+            <a class="btn" href={kit.ctaHref} target="_blank" rel="noopener noreferrer">{kit.cta} <span aria-hidden="true">→</span></a>
+            <a class="ghost" href="https://github.com/joseguzmann" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+          </div>
         </div>
+        <ArchDiagram layout={arch} label="Web and mobile apps call a backend API; an AI agent works with the backend and the database; everything runs on Docker, Linux, AWS and CI/CD." />
       </section>
 
       <section id="experience" class="block" aria-labelledby="ex-h">
@@ -90,6 +112,20 @@ const canonical = new URL('/', Astro.site);
 <style>
   main section[id] { scroll-margin-top: 40px; }
   #main { scroll-margin-top: 64px; }
+  .hero2 { grid-template-columns: minmax(0, 1fr) minmax(0, 540px); align-items: center; gap: 32px 48px; }
+  .hero-l { display: grid; gap: 14px; }
+  .name { font-size: clamp(44px, 6vw, 72px); font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
+  .role { font-size: clamp(19px, 2.2vw, 24px); font-weight: 600; color: #c9d1d9; }
+  .hero-l .row { margin-top: 10px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  /* Palabra que rota: 5 × 2 s, sincronizada con el diagrama. */
+  .rot { font-size: clamp(22px, 2.6vw, 28px); color: var(--mute); display: flex; gap: .3em; flex-wrap: wrap; align-items: baseline; }
+  .words { display: inline-grid; font-weight: 600; }
+  .words span { grid-area: 1 / 1; opacity: 0; animation: w5 10s infinite; background: linear-gradient(90deg, #39c5cf, #3fb950, #4493f8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .words span:nth-child(2) { animation-delay: 2s; } .words span:nth-child(3) { animation-delay: 4s; } .words span:nth-child(4) { animation-delay: 6s; } .words span:nth-child(5) { animation-delay: 8s; }
+  @keyframes w5 { 0% { opacity: 0; transform: translateY(8px); } 3%, 17% { opacity: 1; transform: none; } 20%, 100% { opacity: 0; transform: translateY(-8px); } }
+  @media (prefers-reduced-motion: reduce) { .words span { animation: none; } .words span:first-child { opacity: 1; } }
+  @media (max-width: 900px) { .hero2 { grid-template-columns: 1fr; } }
   .h1-long { font-size: clamp(32px, 4.6vw, 54px); max-width: 22ch; letter-spacing: -0.035em; line-height: 1.05; }
   .skip { position: absolute; left: 16px; top: -60px; z-index: 50; background: var(--fg); color: var(--canvas); padding: 8px 12px; border-radius: 6px; }
   .skip:focus { top: 10px; }
