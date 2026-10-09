@@ -62,7 +62,7 @@ const arch: ArtLayout = {
     <SiteHeader anim="cycle" />
 
     <main id="main" class="wrap">
-      <section class="pv-hero hero2">
+      <section class="pv-hero hero2" data-on="0">
         <div class="hero-l">
           <h1 class="name">{kit.name}</h1>
           <p class="role">{role}</p>
@@ -72,7 +72,7 @@ const arch: ArtLayout = {
             <a class="ghost" href="https://github.com/joseguzmann" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
           </div>
         </div>
-        <ArchArt layout={arch} mode="icon" label="Web and mobile apps call a backend API; an AI agent works with the backend and the database; everything runs on Docker, Linux, AWS and CI/CD." />
+        <ArchArt layout={arch} mode="icon" controlled label="Web and mobile apps call a backend API; an AI agent works with the backend and the database; everything runs on Docker, Linux, AWS and CI/CD." />
       </section>
 
       <section id="experience" class="block" aria-labelledby="ex-h">
@@ -113,6 +113,28 @@ const arch: ArtLayout = {
       <span>© {new Date().getFullYear()} {kit.name}</span>
       <span><a href={kit.ctaHref} target="_blank" rel="me noopener noreferrer">LinkedIn</a> · <a href="https://github.com/joseguzmann" target="_blank" rel="me noopener noreferrer">GitHub</a></span>
     </footer>
+    <script>
+      // Hero: la palabra y el diagrama comparten un índice (data-on). Rota cada 2 s; pasar el cursor
+      // (o tocar) una caja la selecciona y pausa el ciclo, que sigue desde ahí al salir.
+      const hero = document.querySelector<HTMLElement>('.hero2');
+      if (hero) {
+        const N = 5, STEP = 2000;
+        const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let i = 0, timer: number | undefined;
+        const set = (k: number) => { i = k; hero.dataset.on = String(k); };
+        const start = () => { if (!still) { clearInterval(timer); timer = window.setInterval(() => set((i + 1) % N), STEP); } };
+        const stop = () => clearInterval(timer);
+        hero.querySelectorAll<SVGGElement>('svg .node').forEach((g) => {
+          const m = [...g.classList].find((c) => /^k\d$/.test(c));
+          if (!m) return;
+          const k = Number(m.slice(1));
+          g.addEventListener('pointerenter', () => { stop(); set(k); });
+          g.addEventListener('pointerleave', start);
+          g.addEventListener('click', () => { stop(); set(k); start(); });
+        });
+        start();
+      }
+    </script>
   </body>
 </html>
 
@@ -128,10 +150,10 @@ const arch: ArtLayout = {
   /* Palabra que rota: 5 × 2 s, sincronizada con el diagrama. */
   .rot { font-size: clamp(22px, 2.6vw, 28px); color: var(--mute); display: flex; gap: .3em; flex-wrap: wrap; align-items: baseline; }
   .words { display: inline-grid; font-weight: 600; }
-  .words span { grid-area: 1 / 1; opacity: 0; animation: w5 10s infinite; background: linear-gradient(90deg, #39c5cf, #3fb950, #4493f8); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .words span:nth-child(2) { animation-delay: 2s; } .words span:nth-child(3) { animation-delay: 4s; } .words span:nth-child(4) { animation-delay: 6s; } .words span:nth-child(5) { animation-delay: 8s; }
-  @keyframes w5 { 0% { opacity: 0; transform: translateY(8px); } 3%, 17% { opacity: 1; transform: none; } 20%, 100% { opacity: 0; transform: translateY(-8px); } }
-  @media (prefers-reduced-motion: reduce) { .words span { animation: none; } .words span:first-child { opacity: 1; } }
+  .words span { grid-area: 1 / 1; opacity: 0; transform: translateY(8px); transition: opacity .35s ease, transform .35s ease; background: linear-gradient(90deg, #39c5cf, #3fb950, #4493f8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero2[data-on='0'] .words span:nth-child(1), .hero2[data-on='1'] .words span:nth-child(2), .hero2[data-on='2'] .words span:nth-child(3),
+  .hero2[data-on='3'] .words span:nth-child(4), .hero2[data-on='4'] .words span:nth-child(5) { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .words span { transition: none; } }
   @media (max-width: 900px) { .hero2 { grid-template-columns: 1fr; } }
   .h1-long { font-size: clamp(32px, 4.6vw, 54px); max-width: 22ch; letter-spacing: -0.035em; line-height: 1.05; }
   .skip { position: absolute; left: 16px; top: -60px; z-index: 50; background: var(--fg); color: var(--canvas); padding: 8px 12px; border-radius: 6px; }

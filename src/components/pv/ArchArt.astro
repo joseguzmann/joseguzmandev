@@ -5,8 +5,8 @@
 export type Art = 'browser' | 'phone' | 'server' | 'robot' | 'db';
 export type ArtNode = { id: string; x: number; y: number; w: number; h: number; t: string; s: string; k: number; art: Art };
 export type ArtLayout = { vb: [number, number]; nodes: ArtNode[]; edges: [string, string, number[]?][]; infra: { x: number; y: number; w: number; h: number; label: string } };
-interface Props { layout: ArtLayout; mode: 'icon' | 'tile' | 'shape' | 'alive'; label: string }
-const { layout, mode, label } = Astro.props;
+interface Props { layout: ArtLayout; mode: 'icon' | 'tile' | 'shape' | 'alive'; label: string; /** El encendido lo maneja data-on en un ancestro (hover + ciclo por JS). */ controlled?: boolean }
+const { layout, mode, label, controlled = false } = Astro.props;
 const byId = Object.fromEntries(layout.nodes.map((n) => [n.id, n]));
 
 const anchors = (a: ArtNode, b: ArtNode) => {
@@ -38,7 +38,7 @@ const ICON: Record<Art, string> = {
 };
 ---
 
-<svg class:list={['art', `m-${mode}`]} viewBox={`0 0 ${layout.vb[0]} ${layout.vb[1]}`} role="img" aria-label={label}>
+<svg class:list={['art', `m-${mode}`, { ctl: controlled }]} viewBox={`0 0 ${layout.vb[0]} ${layout.vb[1]}`} role="img" aria-label={label}>
   <defs>
     <linearGradient id={`g-${mode}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#39c5cf" /><stop offset=".5" stop-color="#3fb950" /><stop offset="1" stop-color="#4493f8" /></linearGradient>
   </defs>
@@ -159,6 +159,19 @@ const ICON: Record<Art, string> = {
   .m-alive .ui { animation: ui 3s ease-in-out infinite; } .m-alive .u2 { animation-delay: .5s; }
   @keyframes ui { 50% { fill: var(--line); } }
 
+  /* Modo controlado: sin keyframes; se enciende lo que coincide con data-on del ancestro. */
+  .ctl .node .sh, .ctl .infra rect, .ctl .edge, .ctl .ic { animation: none !important; transition: stroke .35s ease; }
+  .ctl .node[class*=k] { cursor: pointer; }
+  :global([data-on='0']) .ctl .k0 .sh, :global([data-on='0']) .ctl .edge.k0, :global([data-on='0']) .ctl .k0 rect { stroke: #3fb950; }
+  :global([data-on='0']) .ctl .k0 .ic { stroke: #3fb950; }
+  :global([data-on='1']) .ctl .k1 .sh, :global([data-on='1']) .ctl .edge.k1, :global([data-on='1']) .ctl .k1 rect { stroke: #3fb950; }
+  :global([data-on='1']) .ctl .k1 .ic { stroke: #3fb950; }
+  :global([data-on='2']) .ctl .k2 .sh, :global([data-on='2']) .ctl .edge.k2, :global([data-on='2']) .ctl .k2 rect { stroke: #3fb950; }
+  :global([data-on='2']) .ctl .k2 .ic { stroke: #3fb950; }
+  :global([data-on='3']) .ctl .k3 .sh, :global([data-on='3']) .ctl .edge.k3, :global([data-on='3']) .ctl .k3 rect { stroke: #3fb950; }
+  :global([data-on='3']) .ctl .k3 .ic { stroke: #3fb950; }
+  :global([data-on='4']) .ctl .k4 .sh, :global([data-on='4']) .ctl .edge.k4, :global([data-on='4']) .ctl .k4 rect { stroke: #3fb950; }
+  :global([data-on='4']) .ctl .k4 .ic { stroke: #3fb950; }
   @media (prefers-reduced-motion: reduce) {
     .art *, .art .sh, .edge { animation: none !important; }
     .m-alive .bub { opacity: 1; }

@@ -112,10 +112,10 @@ const sections = [
   @keyframes draw { 0% { stroke-dashoffset: 1; } 50%, 85% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -1; } }
 
   /* ── Cycle: el color recorre celeste → verde → azul; las barras se encienden en secuencia ── */
-  [data-anim='cycle'][data-active='brand'] .b { animation: blink calc(1s * var(--spd)) ease-in-out infinite; }
-  [data-anim='cycle'][data-active='brand'] .b2 { animation-delay: calc(.17s * var(--spd)); }
-  [data-anim='cycle'][data-active='brand'] .b3 { animation-delay: calc(.34s * var(--spd)); }
-  @keyframes blink { 0%, 100% { opacity: .35; } 40% { opacity: 1; } }
+  [data-anim='cycle'][data-active='brand'] .b { animation: blink calc(2.4s * var(--spd)) ease-in-out infinite; }
+  [data-anim='cycle'][data-active='brand'] .b2 { animation-delay: calc(.4s * var(--spd)); }
+  [data-anim='cycle'][data-active='brand'] .b3 { animation-delay: calc(.8s * var(--spd)); }
+  @keyframes blink { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
   [data-anim='cycle'] nav a[aria-current] svg path { animation: hue calc(1.2s * var(--spd)) linear infinite; }
   @keyframes hue { 0%, 100% { stroke: #39c5cf; } 33% { stroke: #3fb950; } 66% { stroke: #4493f8; } }
 
