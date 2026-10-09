@@ -9,7 +9,7 @@ import ContribGraph from '../components/pv/ContribGraph.astro';
 import ProfileFacts from '../components/pv/ProfileFacts.astro';
 import { kit, profile } from '../data/preview-kit';
 
-const title = `${kit.name} — ${profile.title}`;
+const title = `${kit.name} — CS Engineer`;
 const description = `${profile.headline} ${profile.sub}`;
 const canonical = new URL('/', Astro.site);
 ---
@@ -34,7 +34,7 @@ const canonical = new URL('/', Astro.site);
     <a class="skip" href="#main">Skip to content</a>
     <header class="pv-top">
       <div class="wrap bar">
-        <p class="repo"><span class="av" aria-hidden="true">JG</span>jose-guzman <span class="dim">/</span> <strong>ai-engineer</strong></p>
+        <p class="repo"><img class="logo" src="/favicon.svg" width="26" height="26" alt="" />jose-guzman <span class="dim">/</span> <strong>cs-engineer</strong></p>
         <nav aria-label="Sections"><a href="#experience">Experience</a><a href="#activity">Activity</a><a href="#systems">Systems</a><a href="#skills">Skills</a></nav>
         <a class="btn sm" href={kit.ctaHref}>{kit.cta}</a>
       </div>
@@ -93,6 +93,7 @@ const canonical = new URL('/', Astro.site);
 </html>
 
 <style>
+  .logo { display: block; border-radius: 6px; }
   .h1-long { font-size: clamp(32px, 4.6vw, 54px); max-width: 22ch; letter-spacing: -0.035em; line-height: 1.05; }
   .skip { position: absolute; left: 16px; top: -60px; z-index: 50; background: var(--fg); color: var(--canvas); padding: 8px 12px; border-radius: 6px; }
   .skip:focus { top: 10px; }
