@@ -2,6 +2,7 @@
 // Home de joseguzman.dev. Diseño elegido por Jose el 2026-10-08: la preview 15
 // (Pipeline · AI Engineer), con la experiencia antes de la actividad de GitHub.
 import '../styles/pv-dark.css';
+import SiteHeader from '../components/SiteHeader.astro';
 import RunHistory from '../components/pv/RunHistory.astro';
 import ProcessRun from '../components/pv/ProcessRun.astro';
 import Artifacts from '../components/pv/Artifacts.astro';
@@ -12,12 +13,6 @@ import { kit, profile } from '../data/preview-kit';
 const title = `${kit.name} — CS Engineer`;
 const description = `${profile.headline} ${profile.sub}`;
 const canonical = new URL('/', Astro.site);
-const sections = [
-  { id: 'experience', label: 'Experience', icon: 'M2 4h7M5 8h9M3 12h6' },
-  { id: 'activity', label: 'Activity', icon: 'M1.5 9h3l2-5 3 9 2-6 1.5 2h1.5' },
-  { id: 'systems', label: 'Systems', icon: 'M8 1.5 14 4.8v6.4L8 14.5 2 11.2V4.8L8 1.5Zm0 0v13M2 4.8l6 3.3 6-3.3' },
-  { id: 'skills', label: 'Skills', icon: 'M3 3h4v4H3zM9 3h4v4H9zM3 9h4v4H3zM9 9h4v4H9z' },
-];
 ---
 
 <!doctype html>
@@ -37,28 +32,8 @@ const sections = [
     <meta property="og:url" content={canonical} />
   </head>
   <body>
-    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-      <defs><linearGradient id="logo-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#39c5cf" /><stop offset=".5" stop-color="#3fb950" /><stop offset="1" stop-color="#4493f8" /></linearGradient></defs>
-    </svg>
     <a class="skip" href="#main">Skip to content</a>
-    <header class="pv-top">
-      <div class="wrap bar">
-        <a class="brand" href="#main"><img class="logo" src="/favicon.svg" width="28" height="28" alt="" /><span>{kit.name}</span></a>
-        <nav aria-label="Sections">
-          <ul>
-            {sections.map((sec) => (
-              <li>
-                <a href={`#${sec.id}`} data-spy={sec.id}>
-                  <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d={sec.icon} fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                  {sec.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <a class="btn cta" href={kit.ctaHref}>{kit.cta}</a>
-      </div>
-    </header>
+    <SiteHeader anim="cycle" />
 
     <main id="main" class="wrap">
       <section class="pv-hero">
@@ -66,8 +41,8 @@ const sections = [
         <h1 class="h1-long">{profile.headline}</h1>
         <p class="sub">{profile.sub}</p>
         <div class="row">
-          <a class="btn" href={kit.ctaHref}>{kit.cta} <span aria-hidden="true">→</span></a>
-          <a class="ghost" href="https://github.com/joseguzmann">GitHub ↗</a>
+          <a class="btn" href={kit.ctaHref} target="_blank" rel="noopener noreferrer">{kit.cta} <span aria-hidden="true">→</span></a>
+          <a class="ghost" href="https://github.com/joseguzmann" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
         </div>
       </section>
 
@@ -101,42 +76,18 @@ const sections = [
           <h2>Building agents that have to hold up in production?</h2>
           <p class="sub">AI and backend engineering roles, or a system you need built and run.</p>
         </div>
-        <a class="btn" href={kit.ctaHref}>{kit.cta} <span aria-hidden="true">→</span></a>
+        <a class="btn" href={kit.ctaHref} target="_blank" rel="noopener noreferrer">{kit.cta} <span aria-hidden="true">→</span></a>
       </section>
     </main>
 
     <footer class="wrap pv-foot">
       <span>© {new Date().getFullYear()} {kit.name}</span>
-      <span><a href={kit.ctaHref} rel="me">LinkedIn</a> · <a href="https://github.com/joseguzmann" rel="me">GitHub</a></span>
+      <span><a href={kit.ctaHref} target="_blank" rel="me noopener noreferrer">LinkedIn</a> · <a href="https://github.com/joseguzmann" target="_blank" rel="me noopener noreferrer">GitHub</a></span>
     </footer>
-    <script>
-      // Marca en el menú la sección visible. Sin JS, el menú funciona igual como anclas.
-      const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-spy]')];
-      const byId = new Map(links.map((a) => [a.dataset.spy!, a]));
-      const io = new IntersectionObserver((entries) => {
-        for (const e of entries) {
-          if (!e.isIntersecting) continue;
-          links.forEach((a) => a.removeAttribute('aria-current'));
-          byId.get(e.target.id)?.setAttribute('aria-current', 'true');
-        }
-      }, { rootMargin: '-45% 0px -50% 0px' });
-      byId.forEach((_, id) => { const el = document.getElementById(id); if (el) io.observe(el); });
-    </script>
   </body>
 </html>
 
 <style>
-  .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--fg); white-space: nowrap; font-weight: 650; font-size: 16px; letter-spacing: -0.01em; }
-  .logo { display: block; border-radius: 6px; }
-  .pv-top .bar { gap: 24px; min-height: 64px; }
-  .pv-top nav ul { display: flex; align-items: center; gap: 4px; }
-  .pv-top nav a { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px; border-radius: 8px; color: #c9d1d9; font-size: 15px; font-weight: 500; transition: background-color .15s, color .15s; }
-  .pv-top nav a svg { color: var(--mute); }
-  .pv-top nav a:hover { color: var(--fg); }
-  /* Activo: el ícono toma los colores del logo y el texto pasa a blanco. */
-  .pv-top nav a[aria-current] { color: var(--fg); font-weight: 600; }
-  .pv-top nav a[aria-current] svg path { stroke: url(#logo-grad); stroke-width: 1.8; }
-  .cta { min-height: 40px; font-size: 14px; }
   main section[id] { scroll-margin-top: 80px; }
   .h1-long { font-size: clamp(32px, 4.6vw, 54px); max-width: 22ch; letter-spacing: -0.035em; line-height: 1.05; }
   .skip { position: absolute; left: 16px; top: -60px; z-index: 50; background: var(--fg); color: var(--canvas); padding: 8px 12px; border-radius: 6px; }

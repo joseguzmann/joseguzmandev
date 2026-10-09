@@ -27,7 +27,7 @@ const total = data.lastYearTotal.toLocaleString('en-US');
 <figure class:list={['contrib', { compact }]}>
   <figcaption class="cap">
     <span><strong>{total}</strong> contributions in the last year</span>
-    <a class="mono small" href={`https://github.com/${data.login}`}>github.com/{data.login} ↗</a>
+    <a class="mono small" href={`https://github.com/${data.login}`} target="_blank" rel="noopener noreferrer">github.com/{data.login} ↗</a>
   </figcaption>
   <div class="scroller" tabindex="0" aria-label="Contribution calendar, scrollable">
     <div class="cal" style={`--w:${weeks.length}`} role="img" aria-label={`${total} GitHub contributions in the last year, most of them in private repositories`}>

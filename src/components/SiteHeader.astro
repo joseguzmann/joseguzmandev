@@ -1,0 +1,144 @@
+---
+// Header del sitio. Lo "activo" (animado y en colores del logo) es el logo mientras se ve el hero,
+// y pasa al ícono de la sección visible al hacer scroll. `anim` elige la animación.
+import { kit } from '../data/preview-kit';
+
+export type HeaderAnim = 'shimmer' | 'pulse' | 'trace' | 'cycle';
+interface Props {
+  anim?: HeaderAnim;
+}
+const { anim = 'shimmer' } = Astro.props;
+
+const sections = [
+  { id: 'experience', label: 'Experience', icon: 'M2 4h7M5 8h9M3 12h6' },
+  { id: 'activity', label: 'Activity', icon: 'M1.5 9h3l2-5 3 9 2-6 1.5 2h1.5' },
+  { id: 'systems', label: 'Systems', icon: 'M8 1.5 14 4.8v6.4L8 14.5 2 11.2V4.8L8 1.5Zm0 0v13M2 4.8l6 3.3 6-3.3' },
+  { id: 'skills', label: 'Skills', icon: 'M3 3h4v4H3zM9 3h4v4H9zM3 9h4v4H3zM9 9h4v4H9z' },
+];
+---
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="logo-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#39c5cf" /><stop offset=".5" stop-color="#3fb950" /><stop offset="1" stop-color="#4493f8" /></linearGradient>
+    <linearGradient id="logo-shimmer" x1="0" y1="0" x2="1" y2="0" spreadMethod="repeat">
+      <stop offset="0" stop-color="#39c5cf" /><stop offset=".33" stop-color="#3fb950" /><stop offset=".66" stop-color="#4493f8" /><stop offset="1" stop-color="#39c5cf" />
+      <animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="1 0" dur="1.4s" repeatCount="indefinite" />
+    </linearGradient>
+  </defs>
+</svg>
+
+<header class="site-hd" data-anim={anim} data-active="brand">
+  <div class="wrap bar">
+    <a class="brand" href="#main" aria-label={`${kit.name} — top of the page`}>
+      <svg class="logo" viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
+        <rect width="32" height="32" rx="7" fill="#0d1117" />
+        <rect class="b b1" x="5" y="7" width="12" height="4" rx="2" />
+        <rect class="b b2" x="11" y="14" width="10" height="4" rx="2" />
+        <rect class="b b3" x="15" y="21" width="12" height="4" rx="2" />
+      </svg>
+      <span>{kit.name}</span>
+    </a>
+    <nav aria-label="Sections">
+      <ul>
+        {sections.map((sec) => (
+          <li>
+            <a href={`#${sec.id}`} data-spy={sec.id} title={sec.label}>
+              <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d={sec.icon} pathLength="1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              <span class="lbl">{sec.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <a class="btn cta" href={kit.ctaHref} target="_blank" rel="noopener noreferrer">{kit.cta}</a>
+  </div>
+</header>
+
+<script>
+  // Lo activo es el logo hasta que una sección cruza el 45 % de la pantalla; después, esa sección.
+  const hd = document.querySelector<HTMLElement>('.site-hd')!;
+  const links = [...hd.querySelectorAll<HTMLAnchorElement>('[data-spy]')];
+  const targets = links.map((a) => document.getElementById(a.dataset.spy!)).filter(Boolean) as HTMLElement[];
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    const line = innerHeight * 0.45;
+    let current = 'brand';
+    for (const t of targets) if (t.getBoundingClientRect().top <= line) current = t.id;
+    if (hd.dataset.active === current) return;
+    hd.dataset.active = current;
+    links.forEach((a) => (a.dataset.spy === current ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+  };
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  addEventListener('resize', update);
+  update();
+</script>
+
+<style>
+  .site-hd { --spd: 1; background: var(--inset); border-bottom: 1px solid var(--line-2); position: sticky; top: 0; z-index: 20; }
+  .bar { display: flex; justify-content: space-between; align-items: center; gap: 24px; min-height: 64px; }
+  .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--fg); white-space: nowrap; font-weight: 650; font-size: 16px; letter-spacing: -0.01em; }
+  .logo { display: block; border-radius: 6px; overflow: visible; }
+  .b { transform-box: fill-box; transform-origin: left center; }
+  .b1 { fill: #39c5cf; } .b2 { fill: #3fb950; } .b3 { fill: #4493f8; }
+  nav { margin-left: auto; }
+  nav ul { display: flex; align-items: center; gap: 4px; }
+  nav a { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px; border-radius: 8px; color: #c9d1d9; font-size: 15px; font-weight: 500; text-decoration: none; transition: color .2s; }
+  nav a svg { color: var(--mute); overflow: visible; transition: color .2s; }
+  nav a:hover { color: var(--fg); }
+  nav a[aria-current] { color: var(--fg); font-weight: 600; }
+  /* Ícono activo en colores del logo (todas las variantes). */
+  nav a[aria-current] svg path { stroke: url(#logo-grad); stroke-width: 1.8; }
+  .cta { min-height: 40px; font-size: 14px; }
+
+  /* ── Shimmer: los colores corren por lo activo ── */
+  [data-anim='shimmer'][data-active='brand'] .b { fill: url(#logo-shimmer); }
+  [data-anim='shimmer'] nav a[aria-current] svg path { stroke: url(#logo-shimmer); }
+
+  /* ── Pulse: lo activo respira con un brillo suave ── */
+  [data-anim='pulse'][data-active='brand'] .logo,
+  [data-anim='pulse'] nav a[aria-current] svg { animation: glow calc(1.3s * var(--spd)) ease-in-out infinite; }
+  @keyframes glow {
+    0%, 100% { filter: drop-shadow(0 0 0 rgb(63 185 80 / 0)); }
+    50% { filter: drop-shadow(0 0 5px rgb(68 200 160 / .75)); }
+  }
+
+  /* ── Trace: las barras crecen como spans; el ícono se dibuja ── */
+  [data-anim='trace'][data-active='brand'] .b { animation: span calc(1.4s * var(--spd)) cubic-bezier(.3,.7,.3,1) infinite; }
+  [data-anim='trace'][data-active='brand'] .b2 { animation-delay: calc(.15s * var(--spd)); }
+  [data-anim='trace'][data-active='brand'] .b3 { animation-delay: calc(.3s * var(--spd)); }
+  @keyframes span { 0% { transform: scaleX(.15); } 45%, 100% { transform: scaleX(1); } }
+  [data-anim='trace'] nav a[aria-current] svg path { stroke-dasharray: 1; animation: draw calc(1.4s * var(--spd)) ease-in-out infinite; }
+  @keyframes draw { 0% { stroke-dashoffset: 1; } 50%, 85% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -1; } }
+
+  /* ── Cycle: el color recorre celeste → verde → azul; las barras se encienden en secuencia ── */
+  [data-anim='cycle'][data-active='brand'] .b { animation: blink calc(1s * var(--spd)) ease-in-out infinite; }
+  [data-anim='cycle'][data-active='brand'] .b2 { animation-delay: calc(.17s * var(--spd)); }
+  [data-anim='cycle'][data-active='brand'] .b3 { animation-delay: calc(.34s * var(--spd)); }
+  @keyframes blink { 0%, 100% { opacity: .35; } 40% { opacity: 1; } }
+  [data-anim='cycle'] nav a[aria-current] svg path { animation: hue calc(1.2s * var(--spd)) linear infinite; }
+  @keyframes hue { 0%, 100% { stroke: #39c5cf; } 33% { stroke: #3fb950; } 66% { stroke: #4493f8; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-hd *, .site-hd *::before { animation: none !important; }
+    /* El shimmer es una animación SVG: en movimiento reducido se usan colores fijos. */
+    .site-hd .b1 { fill: #39c5cf !important; } .site-hd .b2 { fill: #3fb950 !important; } .site-hd .b3 { fill: #4493f8 !important; }
+    .site-hd nav a[aria-current] svg path { stroke: url(#logo-grad) !important; }
+  }
+  /* Hasta 900 px el menú queda en íconos (la etiqueta sigue para lectores); bajo 600 px se oculta el botón,
+     el hero ya tiene el suyo. */
+  .cta { white-space: nowrap; }
+  @media (max-width: 900px) {
+    .bar { gap: 12px; }
+    nav ul { gap: 0; }
+    nav a { width: 44px; height: 44px; padding: 0; justify-content: center; }
+    nav a svg { width: 18px; height: 18px; }
+    .lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
+  @media (max-width: 600px) {
+    .cta { display: none; }
+  }
+  @media (max-width: 360px) {
+    .brand span { display: none; }
+  }
+</style>

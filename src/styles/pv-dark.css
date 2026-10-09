@@ -12,6 +12,7 @@
   --sans: 'Hanken Grotesk Variable', system-ui, sans-serif; --mono: 'IBM Plex Mono', ui-monospace, monospace;
 }
 * { box-sizing: border-box; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 body { margin: 0; background: var(--canvas); color: var(--fg); font: 400 16px/1.55 var(--sans); padding-bottom: 96px; -webkit-font-smoothing: antialiased; }
 h1, h2, h3, h4, p, ul, ol, dl, dd { margin: 0; padding: 0; }
 ul, ol { list-style: none; }
