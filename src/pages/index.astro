@@ -3,7 +3,7 @@
 // (Pipeline · AI Engineer), con la experiencia antes de la actividad de GitHub.
 import '../styles/pv-dark.css';
 import SiteHeader from '../components/SiteHeader.astro';
-import ArchDiagram, { type ArchLayout, type ArchNode } from '../components/pv/ArchDiagram.astro';
+import ArchArt, { type ArtLayout, type ArtNode, type Art } from '../components/pv/ArchArt.astro';
 import RunHistory from '../components/pv/RunHistory.astro';
 import ProcessRun from '../components/pv/ProcessRun.astro';
 import Artifacts from '../components/pv/Artifacts.astro';
@@ -16,21 +16,21 @@ const description = 'Software & AI Engineer in Quito, Ecuador. Web and mobile ap
 const canonical = new URL('/', Astro.site);
 const role = 'Software & AI Engineer';
 const words = ['frontends', 'mobile apps', 'backends', 'AI agents', 'infrastructure'];
-// Diagrama elegido el 2026-10-09 (ronda 6, opción B): web y mobile llaman al backend; el agente
-// trabaja con el backend y la base; todo corre sobre Docker · Linux · AWS · CI/CD.
-const T = {
-  web: { t: 'Web app', s: 'React · Angular · Vue', k: 0 },
-  mob: { t: 'Mobile app', s: 'React Native', k: 1 },
-  api: { t: 'Backend / API', s: 'Python · Scala · TypeScript', k: 2 },
-  agt: { t: 'AI agent', s: 'LangChain · LangGraph · RAG', k: 3 },
-  db: { t: 'Database', s: 'PostgreSQL · Redis · pgvector', k: -1 },
+// Diagrama elegido el 2026-10-09 (ronda 7, opción 1: íconos de línea): web y mobile llaman al backend;
+// el agente trabaja con el backend y la base; todo corre sobre Docker · Linux · AWS · CI/CD.
+const T: Record<string, { t: string; s: string; k: number; art: Art }> = {
+  web: { t: 'Web app', s: 'React · Angular · Vue', k: 0, art: 'browser' },
+  mob: { t: 'Mobile app', s: 'React Native', k: 1, art: 'phone' },
+  api: { t: 'Backend / API', s: 'Python · Scala · TypeScript', k: 2, art: 'server' },
+  agt: { t: 'AI agent', s: 'LangChain · LangGraph · RAG', k: 3, art: 'robot' },
+  db: { t: 'Database', s: 'PostgreSQL · Redis · pgvector', k: -1, art: 'db' },
 };
-const n = (id: keyof typeof T, x: number, y: number, w = 200, h = 58): ArchNode => ({ id, x, y, w, h, ...T[id] });
-const arch: ArchLayout = {
-  vb: [520, 370],
-  nodes: [n('web', 20, 16), n('mob', 260, 16), n('api', 70, 140), n('agt', 300, 140), n('db', 180, 262, 212)],
+const n = (id: string, x: number, y: number, w: number, h: number): ArtNode => ({ id, x, y, w, h, ...T[id] });
+const arch: ArtLayout = {
+  vb: [540, 370],
+  nodes: [n('web', 10, 16, 236, 58), n('mob', 280, 16, 236, 58), n('api', 46, 140, 236, 60), n('agt', 296, 140, 236, 60), n('db', 156, 264, 240, 58)],
   edges: [['web', 'api'], ['mob', 'api'], ['api', 'agt'], ['api', 'db'], ['agt', 'db', [3]]],
-  infra: { x: 50, y: 118, w: 465, h: 244, label: 'Docker · Linux · AWS · CI/CD' },
+  infra: { x: 28, y: 118, w: 510, h: 244, label: 'Docker · Linux · AWS · CI/CD' },
 };
 ---
 
@@ -65,7 +65,7 @@ const arch: ArchLayout = {
             <a class="ghost" href="https://github.com/joseguzmann" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
           </div>
         </div>
-        <ArchDiagram layout={arch} label="Web and mobile apps call a backend API; an AI agent works with the backend and the database; everything runs on Docker, Linux, AWS and CI/CD." />
+        <ArchArt layout={arch} mode="icon" label="Web and mobile apps call a backend API; an AI agent works with the backend and the database; everything runs on Docker, Linux, AWS and CI/CD." />
       </section>
 
       <section id="experience" class="block" aria-labelledby="ex-h">
@@ -112,7 +112,7 @@ const arch: ArchLayout = {
 <style>
   main section[id] { scroll-margin-top: 40px; }
   #main { scroll-margin-top: 64px; }
-  .hero2 { grid-template-columns: minmax(0, 1fr) minmax(0, 540px); align-items: center; gap: 32px 48px; }
+  .hero2 { grid-template-columns: minmax(0, 1fr) minmax(0, 560px); align-items: center; gap: 32px 48px; }
   .hero-l { display: grid; gap: 14px; }
   .name { font-size: clamp(44px, 6vw, 72px); font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
   .role { font-size: clamp(19px, 2.2vw, 24px); font-weight: 600; color: #c9d1d9; }
