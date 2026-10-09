@@ -15,7 +15,7 @@ const title = `${kit.name} — CS Engineer`;
 const description = 'Software & AI Engineer in Quito, Ecuador. Web and mobile apps, backends in Python, Scala and TypeScript, and AI agents. Open to remote.';
 const canonical = new URL('/', Astro.site);
 const role = 'Software & AI Engineer';
-const words = ['frontends', 'mobile apps', 'backends', 'AI agents', 'infrastructure'];
+const words = ['frontends', 'mobile apps', 'backends', 'AI agents', 'databases', 'infrastructure'];
 // Diagrama elegido el 2026-10-09 (ronda 7, opción 1: íconos de línea): web y mobile llaman al backend;
 // el agente trabaja con el backend y la base; todo corre sobre Docker · Linux · AWS · CI/CD.
 const T: Record<string, { t: string; s: string; k: number; art: Art }> = {
@@ -23,7 +23,7 @@ const T: Record<string, { t: string; s: string; k: number; art: Art }> = {
   mob: { t: 'Mobile app', s: 'React Native', k: 1, art: 'phone' },
   api: { t: 'Backend / API', s: 'Python · Scala · TypeScript', k: 2, art: 'server' },
   agt: { t: 'AI agent', s: 'LangChain · LangGraph · RAG', k: 3, art: 'robot' },
-  db: { t: 'Database', s: 'PostgreSQL · Redis · pgvector', k: -1, art: 'db' },
+  db: { t: 'Database', s: 'PostgreSQL · Redis · pgvector', k: 4, art: 'db' },
 };
 const n = (id: string, x: number, y: number, w: number, h: number): ArtNode => ({ id, x, y, w, h, ...T[id] });
 // Grilla alineada a los bordes del contenedor (= bordes del navbar): la fila de arriba toca los dos
@@ -36,7 +36,7 @@ const arch: ArtLayout = {
     n('api', 1 + G, 140, 240, 60), n('agt', W - 1 - G - 240, 140, 240, 60),
     n('db', (W - 240) / 2, 264, 240, 58),
   ],
-  edges: [['web', 'api'], ['mob', 'api'], ['api', 'agt'], ['api', 'db'], ['agt', 'db', [3]]],
+  edges: [['web', 'api'], ['mob', 'api'], ['api', 'agt'], ['api', 'db'], ['agt', 'db']],
   infra: { x: 1, y: 118, w: W - 2, h: 246, label: 'Docker · Linux · AWS · CI/CD' },
 };
 ---
@@ -72,7 +72,7 @@ const arch: ArtLayout = {
             <a class="ghost" href="https://github.com/joseguzmann" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
           </div>
         </div>
-        <ArchArt layout={arch} mode="icon" controlled label="Web and mobile apps call a backend API; an AI agent works with the backend and the database; everything runs on Docker, Linux, AWS and CI/CD." />
+        <ArchArt layout={arch} mode="icon" controlled infraK={5} label="Web and mobile apps call a backend API; an AI agent works with the backend and the database; everything runs on Docker, Linux, AWS and CI/CD." />
       </section>
 
       <section id="experience" class="block" aria-labelledby="ex-h">
@@ -118,7 +118,7 @@ const arch: ArtLayout = {
       // (o tocar) una caja la selecciona y pausa el ciclo, que sigue desde ahí al salir.
       const hero = document.querySelector<HTMLElement>('.hero2');
       if (hero) {
-        const N = 5, STEP = 2000;
+        const N = hero.querySelectorAll('.words span').length, STEP = 2000;
         const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
         let i = 0, timer: number | undefined;
         const set = (k: number) => { i = k; hero.dataset.on = String(k); };
@@ -152,7 +152,7 @@ const arch: ArtLayout = {
   .words { display: inline-grid; font-weight: 600; }
   .words span { grid-area: 1 / 1; opacity: 0; transform: translateY(8px); transition: opacity .35s ease, transform .35s ease; background: linear-gradient(90deg, #39c5cf, #3fb950, #4493f8); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .hero2[data-on='0'] .words span:nth-child(1), .hero2[data-on='1'] .words span:nth-child(2), .hero2[data-on='2'] .words span:nth-child(3),
-  .hero2[data-on='3'] .words span:nth-child(4), .hero2[data-on='4'] .words span:nth-child(5) { opacity: 1; transform: none; }
+  .hero2[data-on='3'] .words span:nth-child(4), .hero2[data-on='4'] .words span:nth-child(5), .hero2[data-on='5'] .words span:nth-child(6) { opacity: 1; transform: none; }
   @media (prefers-reduced-motion: reduce) { .words span { transition: none; } }
   @media (max-width: 900px) { .hero2 { grid-template-columns: 1fr; } }
   .h1-long { font-size: clamp(32px, 4.6vw, 54px); max-width: 22ch; letter-spacing: -0.035em; line-height: 1.05; }

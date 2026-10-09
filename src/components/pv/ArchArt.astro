@@ -5,8 +5,8 @@
 export type Art = 'browser' | 'phone' | 'server' | 'robot' | 'db';
 export type ArtNode = { id: string; x: number; y: number; w: number; h: number; t: string; s: string; k: number; art: Art };
 export type ArtLayout = { vb: [number, number]; nodes: ArtNode[]; edges: [string, string, number[]?][]; infra: { x: number; y: number; w: number; h: number; label: string } };
-interface Props { layout: ArtLayout; mode: 'icon' | 'tile' | 'shape' | 'alive'; label: string; /** El encendido lo maneja data-on en un ancestro (hover + ciclo por JS). */ controlled?: boolean }
-const { layout, mode, label, controlled = false } = Astro.props;
+interface Props { layout: ArtLayout; mode: 'icon' | 'tile' | 'shape' | 'alive'; label: string; /** El encendido lo maneja data-on en un ancestro (hover + ciclo por JS). */ controlled?: boolean; /** Índice de palabra de la caja de infraestructura. */ infraK?: number }
+const { layout, mode, label, controlled = false, infraK = 4 } = Astro.props;
 const byId = Object.fromEntries(layout.nodes.map((n) => [n.id, n]));
 
 const anchors = (a: ArtNode, b: ArtNode) => {
@@ -42,7 +42,7 @@ const ICON: Record<Art, string> = {
   <defs>
     <linearGradient id={`g-${mode}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#39c5cf" /><stop offset=".5" stop-color="#3fb950" /><stop offset="1" stop-color="#4493f8" /></linearGradient>
   </defs>
-  <g class="infra k4">
+  <g class:list={['infra', `k${infraK}`]}>
     <rect x={layout.infra.x} y={layout.infra.y} width={layout.infra.w} height={layout.infra.h} rx="14" />
     <text x={layout.infra.x + 14} y={layout.infra.y + layout.infra.h - 12} class="infra-t">{layout.infra.label}</text>
   </g>
@@ -172,6 +172,8 @@ const ICON: Record<Art, string> = {
   :global([data-on='3']) .ctl .k3 .ic { stroke: #3fb950; }
   :global([data-on='4']) .ctl .k4 .sh, :global([data-on='4']) .ctl .edge.k4, :global([data-on='4']) .ctl .k4 rect { stroke: #3fb950; }
   :global([data-on='4']) .ctl .k4 .ic { stroke: #3fb950; }
+  :global([data-on='5']) .ctl .k5 .sh, :global([data-on='5']) .ctl .edge.k5, :global([data-on='5']) .ctl .k5 rect { stroke: #3fb950; }
+  :global([data-on='5']) .ctl .k5 .ic { stroke: #3fb950; }
   @media (prefers-reduced-motion: reduce) {
     .art *, .art .sh, .edge { animation: none !important; }
     .m-alive .bub { opacity: 1; }
