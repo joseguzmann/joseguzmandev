@@ -111,11 +111,12 @@ const sections = [
   [data-anim='trace'] nav a[aria-current] svg path { stroke-dasharray: 1; animation: draw calc(1.4s * var(--spd)) ease-in-out infinite; }
   @keyframes draw { 0% { stroke-dashoffset: 1; } 50%, 85% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -1; } }
 
-  /* ── Cycle: el color recorre celeste → verde → azul; las barras se encienden en secuencia ── */
-  [data-anim='cycle'][data-active='brand'] .b { animation: blink calc(2.4s * var(--spd)) ease-in-out infinite; }
-  [data-anim='cycle'][data-active='brand'] .b2 { animation-delay: calc(.4s * var(--spd)); }
-  [data-anim='cycle'][data-active='brand'] .b3 { animation-delay: calc(.8s * var(--spd)); }
-  @keyframes blink { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+  /* ── Cycle: el color recorre celeste → verde → azul, igual en el logo (desfasado por barra, así
+     fluye de una a otra) y en el ícono de la sección activa ── */
+  [data-anim='cycle'][data-active='brand'] .b { animation: huefill calc(1.2s * var(--spd)) linear infinite; }
+  [data-anim='cycle'][data-active='brand'] .b2 { animation-delay: calc(-.4s * var(--spd)); }
+  [data-anim='cycle'][data-active='brand'] .b3 { animation-delay: calc(-.8s * var(--spd)); }
+  @keyframes huefill { 0%, 100% { fill: #39c5cf; } 33% { fill: #3fb950; } 66% { fill: #4493f8; } }
   [data-anim='cycle'] nav a[aria-current] svg path { animation: hue calc(1.2s * var(--spd)) linear infinite; }
   @keyframes hue { 0%, 100% { stroke: #39c5cf; } 33% { stroke: #3fb950; } 66% { stroke: #4493f8; } }
 
