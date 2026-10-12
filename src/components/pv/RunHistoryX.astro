@@ -1,0 +1,156 @@
+---
+// Variantes de RunHistory: mismo esquema —estado, rol, fechas, barra en el eje real y despliegue al grafo—
+// con un cambio puntual por interruptor. El home usa text 'b' + logos (elegido por Jose el 2026-10-12).
+import RoleGraph from './RoleGraph.astro';
+import { kit, orgColor } from '../../data/preview-kit';
+import { mi, fmt, duration, axisStart, axisEnd, axisLen, axisYears, expByRecent } from '../../data/preview-dates';
+
+export type Flags = { text?: 'a' | 'b' | 'c' | 'd' | 'e' | 'f'; logo?: boolean; chev?: boolean; now?: boolean; orgFirst?: boolean; durIn?: boolean; live?: boolean; compact?: boolean; bands?: boolean; rail?: boolean };
+interface Props { f: Flags; /** Empresa cuyo rol aparece abierto al cargar. */ openOrg?: string }
+const { f, openOrg } = Astro.props;
+const pos = (m: number) => ((m - axisStart) / axisLen) * 100;
+const wid = (s: string, e: string | null) => ((mi(e ?? kit.asOf) - mi(s) + 1) / axisLen) * 100;
+const yx = (y: number) => pos(Math.max(y * 12, axisStart));
+const today = pos(axisEnd + 1);
+// Rol base y modalidad ("AI Engineer · contract" → "AI Engineer", "Contract").
+const split = (role: string) => { const [base, kind] = role.split(' · '); return { base, kind: kind ? kind[0].toUpperCase() + kind.slice(1) : null }; };
+const initials = (org: string) => org.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+// Logos en public/companies/<slug>.(png|svg); si no hay archivo, iniciales.
+const slug = (org: string) => org.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+const logoSrc = (org: string) => {
+  for (const ext of ['svg', 'png']) {
+    if (existsSync(join(process.cwd(), 'public/companies', `${slug(org)}.${ext}`))) return `/companies/${slug(org)}.${ext}`;
+  }
+  return null;
+};
+const bands = axisYears.map((y, i) => ({ l: yx(y), w: (i < axisYears.length - 1 ? yx(axisYears[i + 1]) : 100) - yx(y), alt: i % 2 === 1 }));
+---
+
+<div class:list={['history', { compact: f.compact, rail: f.rail, wide: f.logo, 'wide-c': f.text === 'c' }]}>
+  <div class="h-axis mono" aria-hidden="true"><span></span><span class="ax">{axisYears.map((y) => <i style={`left:${yx(y)}%`}>{y}</i>)}{f.now && <i class="nowl" style={`left:${today}%`}>now</i>}</span><span></span></div>
+  {expByRecent.map((r) => (
+    <details class="hrow" style={`--c:${orgColor[r.org]}`} open={r.org === openOrg}>
+      <summary>
+        <span class:list={['st', r.end ? 'done' : 'live']} role="img" aria-label={r.end ? 'Completed' : 'In progress'}>
+          {r.end
+            ? <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="M11.3 5.8 7 10.1 4.8 7.9" fill="none" stroke="#0d1117" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            : <svg class="spin" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-opacity=".3" stroke-width="2"/><path d="M8 2a6 6 0 0 1 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>}
+        </span>
+        <span class:list={['h-main', f.logo && 'with-logo']}>
+          {f.logo && (logoSrc(r.org)
+            ? <img class="logo img" src={logoSrc(r.org)!} width="36" height="36" alt="" loading="lazy" />
+            : <span class="logo" style={`--c:${orgColor[r.org]}`} aria-hidden="true">{initials(r.org)}</span>)}
+          {(() => {
+            const { base, kind } = split(r.role);
+            const when = `${fmt(r.start)} – ${fmt(r.end)}`;
+            const dur = duration(r.start, r.end);
+            switch (f.text) {
+              case 'a': return <span class="tx"><span class="h-t"><strong>{r.org}</strong></span><span class="small">{base}{kind && <> · {kind}</>} · <span class="mono">{when}</span></span></span>;
+              case 'b': return <span class="tx"><span class="h-t"><strong>{base}</strong> <span class="at">at {r.org}</span></span><span class="small mono">{when} · {dur}</span></span>;
+              case 'c': return <span class="tx"><span class="eyebrow-org mono">{r.org}</span><span class="h-t"><strong>{base}</strong>{kind && <span class="chip">{kind}</span>}</span></span>;
+              case 'd': return <span class="tx"><span class="h-t"><strong>{base}</strong>{kind && <span class="chip">{kind}</span>}</span><span class="small">{r.org} · <span class="mono">{dur}</span></span></span>;
+              case 'e': return <span class="tx"><span class="h-t"><strong>{r.org}</strong> <span class="at">· {base}</span></span><span class="small mono">{when}{kind && <> · {kind.toLowerCase()}</>}</span></span>;
+              case 'f': return <span class="tx"><span class="h-t"><strong>{base}</strong></span><span class="small">{r.org}{kind && <> · {kind}</>}</span></span>;
+              default: return <span class="tx">{f.orgFirst
+                ? <span class="h-t"><strong>{r.org}</strong> <span class="at">· {r.role}</span></span>
+                : <span class="h-t"><strong>{r.role}</strong> <span class="at">@ {r.org}</span></span>}
+                <span class="small mono">{when} · {dur}</span></span>;
+            }
+          })()}
+          {f.text === 'c' && <span class="when-r mono small">{fmt(r.start)} – {fmt(r.end)}<br />{duration(r.start, r.end)}</span>}
+        </span>
+        <span class="track" aria-hidden="true">
+          {f.bands && bands.map((b) => <i class:list={['band', { alt: b.alt }]} style={`left:${b.l}%;width:${b.w}%`}></i>)}
+          {!f.bands && axisYears.map((y) => <i class="g" style={`left:${yx(y)}%`}></i>)}
+          {f.rail && <i class="railbg"></i>}
+          {f.now && <i class="today" style={`left:${today}%`}></i>}
+          <span class:list={['span', { open: !r.end }]} style={`left:${pos(mi(r.start))}%;width:${wid(r.start, r.end)}%`}>
+            {f.durIn && wid(r.start, r.end) > 9 && <em class="mono">{duration(r.start, r.end)}</em>}
+            {f.live && !r.end && <b class="pulse"></b>}
+          </span>
+        </span>
+        {f.chev
+          ? <span class="chev2" aria-hidden="true"><svg viewBox="0 0 16 16" width="16" height="16"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+          : <span class="chev mono small" aria-hidden="true">▾</span>}
+      </summary>
+      <div class="h-graph">
+        <p class="small">{r.note}</p>
+        <RoleGraph role={r} hideSource />
+      </div>
+    </details>
+  ))}
+</div>
+
+<style>
+  .history { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .h-axis, .hrow summary { display: grid; grid-template-columns: 24px minmax(0, 320px) 1fr 20px; gap: 14px; align-items: center; padding: 0 18px; }
+  .h-axis { font-size: 11px; color: var(--mute); background: var(--inset); border-bottom: 1px solid var(--line-2); height: 28px; }
+  .h-axis span:first-child { grid-column: 1 / 3; }
+  .ax { position: relative; height: 100%; }
+  .ax i { position: absolute; top: 7px; font-style: normal; transform: translateX(4px); }
+  .ax i.nowl { color: #3fb950; transform: translateX(-100%); padding-right: 4px; }
+  .hrow { border-bottom: 1px solid var(--line-2); }
+  .hrow:last-child { border-bottom: 0; }
+  .hrow summary { list-style: none; cursor: pointer; min-height: 64px; transition: background-color .15s; }
+  .hrow summary::-webkit-details-marker { display: none; }
+  .hrow summary:hover, .hrow[open] summary { background: var(--subtle); }
+  .h-main { display: grid; gap: 2px; min-width: 0; }
+  .h-t { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .at { color: var(--mute); }
+  .tx { display: grid; gap: 2px; min-width: 0; }
+  /* Con logo, la columna de texto necesita más lugar. */
+  .wide .h-axis, .wide .hrow summary { grid-template-columns: 24px minmax(0, 430px) 1fr 20px; }
+  .wide-c .h-axis, .wide-c .hrow summary { grid-template-columns: 24px minmax(0, 500px) 1fr 20px; }
+  .tx .small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .with-logo { grid-template-columns: 36px minmax(0, 1fr) auto; align-items: center; gap: 12px; display: grid; }
+  .logo { width: 36px; height: 36px; border-radius: 9px; display: grid; place-items: center; font: 700 12px var(--sans); color: var(--fg); background: color-mix(in srgb, var(--c) 26%, var(--canvas)); border: 1px solid color-mix(in srgb, var(--c) 55%, transparent); letter-spacing: .02em; }
+  /* Imagen: llena el cuadrado redondeado, sin borde ni fondo agregados. */
+  .logo.img { object-fit: cover; background: none; padding: 0; border: 0; border-radius: 9px; display: block; }
+  .chip { display: inline-block; margin-left: 8px; padding: 0 7px; border-radius: 999px; border: 1px solid var(--line); font: 500 11px var(--mono); color: var(--mute); vertical-align: 2px; }
+  .eyebrow-org { font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: .08em; }
+  .when-r { text-align: right; line-height: 1.35; white-space: nowrap; }
+  .st.done { color: var(--ok); }
+  .st.live { color: var(--warn); }
+  .spin { animation: spin 1.4s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .track { position: relative; height: 64px; }
+  .g { position: absolute; top: 0; bottom: 0; border-left: 1px solid var(--line-2); }
+  .band { position: absolute; top: 0; bottom: 0; }
+  .band.alt { background: rgb(240 246 252 / .03); }
+  .today { position: absolute; top: 0; bottom: 0; border-left: 1px dashed rgb(63 185 80 / .55); }
+  .railbg { position: absolute; left: 0; right: 0; top: 30px; height: 4px; border-radius: 2px; background: var(--line-2); }
+  .span { position: absolute; top: 25px; height: 14px; border-radius: 3px; background: var(--c); min-width: 4px; display: flex; align-items: center; }
+  .span.open { border-radius: 3px 0 0 3px; background: linear-gradient(90deg, var(--c) 80%, color-mix(in srgb, var(--c) 30%, transparent)); }
+  .span em { font-style: normal; font-size: 10.5px; color: #0d1117; font-weight: 500; padding: 0 6px; white-space: nowrap; }
+  .pulse { position: absolute; right: -4px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 60%, transparent); animation: pulse 2s ease-out infinite; }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+  .chev { color: var(--accent); transition: transform .15s; }
+  .chev2 { color: var(--mute); display: grid; place-items: center; transition: transform .2s, color .15s; }
+  .hrow summary:hover .chev2 { color: var(--fg); }
+  .hrow[open] .chev, .hrow[open] .chev2 { transform: rotate(180deg); }
+  .h-graph { display: grid; gap: 14px; padding: 16px 18px 22px; border-top: 1px dashed var(--line); background: var(--canvas); }
+
+  /* Compacta: filas más bajas y texto más ajustado, mismo esquema de dos líneas. */
+  .compact .hrow summary { min-height: 50px; }
+  .compact .h-main { gap: 0; }
+  .compact .h-t { font-size: 14px; }
+  .compact .h-main .small { font-size: 12px; }
+  .compact .track { height: 50px; }
+  .compact .span { top: 19px; height: 12px; }
+  /* Riel: la barra se apoya en una línea de fondo. */
+  .rail .span { top: 26px; height: 12px; border-radius: 6px; }
+  .rail .span.open { border-radius: 6px 0 0 6px; }
+
+  @media (max-width: 860px) {
+    .h-axis { display: none; }
+    .hrow summary, .compact .hrow summary, .wide .hrow summary, .wide-c .hrow summary { grid-template-columns: 20px 1fr 16px; padding: 10px 14px; }
+    .tx .small { white-space: normal; }
+    .track, .compact .track { grid-column: 2 / 3; grid-row: 2; height: 18px; }
+    .span, .compact .span { top: 3px; height: 12px; }
+    .railbg { top: 7px; }
+    .h-t { white-space: normal; }
+  }
+  @media (prefers-reduced-motion: reduce) { .spin, .pulse { animation: none; } }
+</style>

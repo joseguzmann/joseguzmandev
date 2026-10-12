@@ -4,7 +4,7 @@
 import '../styles/pv-dark.css';
 import SiteHeader from '../components/SiteHeader.astro';
 import ArchArt, { type ArtLayout, type ArtNode, type Art } from '../components/pv/ArchArt.astro';
-import RunHistory from '../components/pv/RunHistory.astro';
+import RunHistoryX from '../components/pv/RunHistoryX.astro';
 import ProcessRun from '../components/pv/ProcessRun.astro';
 import Artifacts from '../components/pv/Artifacts.astro';
 import ContribGraph from '../components/pv/ContribGraph.astro';
@@ -76,8 +76,8 @@ const arch: ArtLayout = {
       </section>
 
       <section id="experience" class="block" aria-labelledby="ex-h">
-        <div class="block-h"><h2 id="ex-h">Experience</h2><p class="small mono">open a role to see what I built there</p></div>
-        <RunHistory openOrg="Agents Booster" />
+        <div class="block-h"><h2 id="ex-h">Experience</h2><p class="small mono">Open a role to see what I built there.</p></div>
+        <RunHistoryX f={{ text: 'b', logo: true }} openOrg="Agents Booster" />
       </section>
 
       <section id="activity" class="block" aria-labelledby="ac-h">
