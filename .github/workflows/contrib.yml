@@ -1,0 +1,32 @@
+# Actualiza el gráfico de actividad de GitHub una vez por día. Si el calendario cambió, commitea el
+# JSON y Vercel redepliega solo. Se copia a .github/workflows/ al publicar (scripts/publicar-rama.sh).
+name: Update GitHub activity
+
+on:
+  schedule:
+    - cron: '0 11 * * *' # 06:00 en Quito
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Fetch contribution calendar
+        env:
+          GH_TOKEN: ${{ secrets.CONTRIB_TOKEN || secrets.GITHUB_TOKEN }}
+        run: node scripts/github-contrib.mjs
+      - name: Commit if it changed
+        run: |
+          git diff --quiet -- src/data/github-contributions.json && { echo "no changes"; exit 0; }
+          git config user.name "Jose Guzman"
+          git config user.email "jg175415@gmail.com"
+          git add src/data/github-contributions.json
+          git commit -m "Update GitHub activity"
+          git push
