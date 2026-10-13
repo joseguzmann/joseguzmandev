@@ -121,6 +121,20 @@ const arch: ArtLayout = {
       <span><a href={kit.ctaHref} target="_blank" rel="me noopener noreferrer">LinkedIn</a> · <a href="https://github.com/joseguzmann" target="_blank" rel="me noopener noreferrer">GitHub</a></span>
     </footer>
     <script>
+      // Registro de visitas (api.joseguzman.dev, en la Gateway). Sólo en el dominio real; abrir el
+      // sitio una vez con ?me marca este navegador como de Jose y sus visitas quedan con is_me.
+      if (location.hostname.endsWith('joseguzman.dev')) {
+        try {
+          const q = new URLSearchParams(location.search);
+          if (q.has('me')) localStorage.setItem('jg_me', '1');
+          let vid = localStorage.getItem('jg_vid');
+          if (!vid) { vid = crypto.randomUUID(); localStorage.setItem('jg_vid', vid); }
+          const body = JSON.stringify({ path: location.pathname + location.search, ref: document.referrer, me: localStorage.getItem('jg_me') === '1', vid, lang: navigator.language, screen: `${screen.width}x${screen.height}` });
+          navigator.sendBeacon('https://api.joseguzman.dev/hit', new Blob([body], { type: 'text/plain' }));
+        } catch {}
+      }
+    </script>
+    <script>
       // Duraciones al día: el build las calcula con su fecha, pero la página puede quedar publicada
       // meses. Con la fecha del visitante se rehacen la de los trabajos en curso y el total.
       {
