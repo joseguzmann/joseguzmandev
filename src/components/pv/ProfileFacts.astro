@@ -1,49 +1,49 @@
 ---
-// Skills, educación e idiomas, tal cual el resume (kit.profile).
+// Skills por grupo con el logo de cada herramienta, y al pie del mismo cuadro el título (con el
+// escudo de la EPN) y los idiomas (con bandera). Diseño elegido por Jose el 2026-10-13
+// (previews/skills-2, opción 4). El prop layout queda por las previews viejas que lo pasan.
 import { profile } from '../../data/preview-kit';
+import ToolLogos from './ToolLogos.astro';
 
 interface Props {
   layout?: 'grid' | 'stack';
 }
-const { layout = 'grid' } = Astro.props;
+const ed = profile.education;
 ---
 
-<div class:list={['facts', layout]}>
-  <ul class="skills">
+<div class="facts">
+  <ul>
     {profile.skills.map((g) => (
-      <li class="grp">
-        <p class="mono gname">{g.group}</p>
-        <ul class="chips">{g.items.map((s) => <li>{s}</li>)}</ul>
-      </li>
+      <li><p class="mono gname">{g.group}</p><ToolLogos ids={g.ids} variant="mini" /></li>
     ))}
   </ul>
-  <dl class="side">
-    <div>
-      <dt class="mono">Education</dt>
-      <dd><strong>{profile.education.degree}</strong><br /><span class="small">{profile.education.school} · {profile.education.place} · {profile.education.date}</span></dd>
-    </div>
-    <div>
-      <dt class="mono">Spoken</dt>
-      <dd>{profile.spoken.join(' · ')}</dd>
-    </div>
-  </dl>
+  <div class="foot">
+    <p class="ed"><img class="ic" src={ed.logo} width="34" height="34" alt="Escuela Politécnica Nacional" loading="lazy" /><span><strong>{ed.degree}</strong><span class="dim small"> · {ed.school} · {ed.date}</span></span></p>
+    <p class="lg">
+      {profile.languages.map((l) => (
+        <span class="lp"><img src={l.flag} width="21" height="14" alt="" loading="lazy" /><b>{l.name}</b> <span class="lv">{l.level}</span></span>
+      ))}
+    </p>
+  </div>
 </div>
 
 <style>
-  .facts { display: grid; gap: 14px; }
-  .facts.grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: start; }
-  .skills { display: grid; gap: 1px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--line-2); }
-  .grp { display: grid; grid-template-columns: 130px 1fr; gap: 12px; align-items: baseline; padding: 14px 16px; background: var(--subtle); }
+  .facts { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--subtle); }
+  ul { display: grid; }
+  li { display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: baseline; padding: 14px 16px; border-bottom: 1px solid var(--line-2); }
+  li:last-child { border-bottom: 0; }
   .gname { font-size: 12px; color: var(--mute); }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .chips li { font-size: 13px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--canvas); }
-  .side { display: grid; gap: 1px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--line-2); }
-  .side div { padding: 14px 16px; background: var(--subtle); display: grid; gap: 6px; }
-  .side dt { font-size: 12px; color: var(--mute); }
-  .side dd { font-size: 15px; }
+  .foot { display: grid; grid-template-columns: 1fr auto; gap: 12px 24px; align-items: center; padding: 14px 16px; background: var(--inset); border-top: 1px solid var(--line); }
+  .foot p { display: flex; align-items: center; gap: 12px; font-size: 14px; flex-wrap: wrap; }
+  .foot .ed { flex-wrap: nowrap; }
+  .ic { width: 34px; height: 34px; object-fit: contain; flex: none; }
+  .lg { gap: 10px 20px; }
+  .lp { display: inline-flex; align-items: center; gap: 8px; }
+  .lp img { width: 21px; height: 14px; border-radius: 2px; box-shadow: 0 0 0 1px rgb(255 255 255 / .12); }
+  .lp b { font-weight: 500; }
+  .lv { font: 12px var(--mono); color: var(--ok); border: 1px solid rgb(63 185 80 / .35); background: rgb(63 185 80 / .08); border-radius: 999px; padding: 0 8px; }
   @media (max-width: 860px) {
-    .facts.grid { grid-template-columns: 1fr; }
-    .grp { grid-template-columns: 1fr; gap: 8px; }
+    li { grid-template-columns: 1fr; gap: 6px; }
+    .foot { grid-template-columns: 1fr; }
   }
-  .stack .grp { grid-template-columns: 1fr; gap: 8px; }
 </style>

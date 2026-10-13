@@ -5,11 +5,12 @@ import '../styles/pv-dark.css';
 import SiteHeader from '../components/SiteHeader.astro';
 import ArchArt, { type ArtLayout, type ArtNode, type Art } from '../components/pv/ArchArt.astro';
 import RunHistoryX from '../components/pv/RunHistoryX.astro';
-import ProcessRun from '../components/pv/ProcessRun.astro';
-import Artifacts from '../components/pv/Artifacts.astro';
+import SystemCards from '../components/pv/SystemCards.astro';
+import SideProjects from '../components/pv/SideProjects.astro';
 import ContribGraph from '../components/pv/ContribGraph.astro';
 import ProfileFacts from '../components/pv/ProfileFacts.astro';
 import { kit, profile } from '../data/preview-kit';
+import { spanText, totalMonths } from '../data/preview-dates';
 
 const title = `${kit.name} — CS Engineer`;
 const description = 'Software & AI Engineer in Quito, Ecuador. Web and mobile apps, backends in Python, Scala and TypeScript, and AI agents. Open to remote.';
@@ -76,8 +77,8 @@ const arch: ArtLayout = {
       </section>
 
       <section id="experience" class="block" aria-labelledby="ex-h">
-        <div class="block-h"><h2 id="ex-h">Experience</h2><p class="small mono">Open a role to see what I built there.</p></div>
-        <RunHistoryX f={{ text: 'b', logo: true }} openOrg="Agents Booster" />
+        <div class="block-h"><h2 id="ex-h">Experience <span class="xp-total mono" data-total data-ranges={JSON.stringify(kit.experience.map((e) => [e.start, e.end]))}>{spanText(totalMonths())}</span></h2><p class="small mono">Open a role to see what I built there.</p></div>
+        <RunHistoryX f={{ text: 'b', logo: true, commits: true, panel: 'q10' }} />
       </section>
 
       <section id="activity" class="block" aria-labelledby="ac-h">
@@ -86,12 +87,15 @@ const arch: ArtLayout = {
       </section>
 
       <section id="systems" class="block" aria-labelledby="sy-h">
-        <div class="block-h"><h2 id="sy-h">Systems I built</h2></div>
-        <Artifacts />
+        <div class="block-h"><h2 id="sy-h">Live systems I built</h2></div>
+        <p class="block-note">Private client systems. Happy to show you any of them on a call.</p>
+        <SystemCards />
       </section>
 
-      <section class="block" aria-label="How I work">
-        <ProcessRun log={false} />
+      <section id="side-projects" class="block" aria-labelledby="sp-h">
+        <div class="block-h"><h2 id="sp-h">Side projects</h2></div>
+        <p class="block-note">Things I build for myself.</p>
+        <SideProjects />
       </section>
 
       <section id="skills" class="block" aria-labelledby="sk-h">
@@ -99,13 +103,16 @@ const arch: ArtLayout = {
         <ProfileFacts />
       </section>
 
-      <section class="cta-box">
+      <section class="cta-box" id="contact">
         <div>
-          <p class="eyebrow">{profile.open.toLowerCase()}</p>
-          <h2>Building agents that have to hold up in production?</h2>
-          <p class="sub">AI and backend engineering roles, or a system you need built and run.</p>
+          <p class="eyebrow">open to remote · UTC−5</p>
+          <h2>Need to build something?</h2>
+          <p class="sub">A role to fill or a system to build. Tell me about it.</p>
         </div>
-        <a class="btn" href={kit.ctaHref} target="_blank" rel="noopener noreferrer">{kit.cta} <span aria-hidden="true">→</span></a>
+        <div class="cta-act">
+          <a class="btn" href={`mailto:${kit.email}`}>Email me <span aria-hidden="true">→</span></a>
+          <a class="ghost" href={kit.ctaHref} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        </div>
       </section>
     </main>
 
@@ -113,6 +120,22 @@ const arch: ArtLayout = {
       <span>© {new Date().getFullYear()} {kit.name}</span>
       <span><a href={kit.ctaHref} target="_blank" rel="me noopener noreferrer">LinkedIn</a> · <a href="https://github.com/joseguzmann" target="_blank" rel="me noopener noreferrer">GitHub</a></span>
     </footer>
+    <script>
+      // Duraciones al día: el build las calcula con su fecha, pero la página puede quedar publicada
+      // meses. Con la fecha del visitante se rehacen la de los trabajos en curso y el total.
+      {
+        const now = new Date();
+        const cur = now.getFullYear() * 12 + now.getMonth();
+        const mi = (ym: string) => { const [y, m] = ym.split('-').map(Number); return y * 12 + m - 1; };
+        const txt = (n: number) => { const y = Math.floor(n / 12), m = n % 12; return [y && `${y} yr${y > 1 ? 's' : ''}`, m && `${m} mo${m > 1 ? 's' : ''}`].filter(Boolean).join(' '); };
+        document.querySelectorAll<HTMLElement>('.dur[data-end=""]').forEach((el) => { el.textContent = txt(cur - mi(el.dataset.start!) + 1); });
+        document.querySelectorAll<HTMLElement>('[data-total]').forEach((el) => {
+          const seen = new Set<number>();
+          for (const [s, e] of JSON.parse(el.dataset.ranges!) as [string, string | null][]) for (let i = mi(s); i <= (e ? mi(e) : cur); i++) seen.add(i);
+          el.textContent = txt(seen.size);
+        });
+      }
+    </script>
     <script>
       // Hero: la palabra y el diagrama comparten un índice (data-on). Rota cada 2 s; pasar el cursor
       // (o tocar) una caja la selecciona y pausa el ciclo, que sigue desde ahí al salir.

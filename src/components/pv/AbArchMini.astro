@@ -1,0 +1,43 @@
+---
+// Arquitectura compacta de Agents Booster. Se ilumina con [data-hl] del contenedor .opt (cada nodo
+// lleva data-n). `callouts`: números 1-3 sobre los nodos de cada bloque del CV.
+interface Props { callouts?: boolean }
+const { callouts = false } = Astro.props;
+const pos: Record<string, { x: number; y: number; w: number; h: number }> = {
+  channels: { x: 0, y: 0, w: 260, h: 52 }, console: { x: 280, y: 0, w: 260, h: 52 },
+  api: { x: 0, y: 84, w: 260, h: 52 }, agent: { x: 0, y: 168, w: 260, h: 112 },
+  catalog: { x: 280, y: 168, w: 260, h: 32 }, payments: { x: 280, y: 208, w: 260, h: 32 }, crm: { x: 280, y: 248, w: 260, h: 32 },
+  data: { x: 0, y: 312, w: 260, h: 52 }, evals: { x: 280, y: 312, w: 125, h: 52 }, tracing: { x: 415, y: 312, w: 125, h: 52 },
+};
+const labels: Record<string, string> = { channels: 'WhatsApp · Instagram', console: 'Advisor console & app', api: 'API + workers', agent: 'AI agent · LangGraph', catalog: 'Catalog', payments: 'Payments', crm: 'CRM & calendar', data: 'PostgreSQL · Mongo · Redis', evals: 'Evals', tracing: 'Tracing' };
+const mine = new Set(['agent', 'payments', 'crm', 'evals', 'tracing', 'console']);
+const marks = [{ n: 1, x: 248, y: 168 }, { n: 2, x: 393, y: 312 }, { n: 3, x: 528, y: 0 }];
+---
+
+<svg class="abm" viewBox="-8 -8 556 380" role="img" aria-label="Customers on WhatsApp and Instagram reach an API and an AI agent that uses the catalog, payments, CRM and calendar, and the data stores; advisors use a console and an app; evals and tracing watch the agent.">
+  <path class="e" d="M130 52V84M130 136V168M260 184H280M260 224H280M260 264H280M130 280V312M342 312V296H270V270H260M477 312V296" />
+  {Object.entries(pos).map(([id, p]) => (
+    <g class:list={['nd', { mine: mine.has(id) }]} data-n={id}>
+      <rect x={p.x} y={p.y} width={p.w} height={p.h} rx="8" />
+      <text x={p.x + 12} y={p.y + (p.h > 40 ? 31 : 21)}>{labels[id]}</text>
+      {mine.has(id) && !callouts && <circle cx={p.x + p.w - 12} cy={p.y + 12} r="3.5" />}
+    </g>
+  ))}
+  <text x="12" y="226" class="sub2">› grounding against the catalog</text>
+  <text x="12" y="246" class="sub2">› tools gated by phase</text>
+  <text x="12" y="266" class="sub2">› photos sent by code</text>
+  {callouts && marks.map((m) => <g class="co"><circle cx={m.x} cy={m.y} r="11" /><text x={m.x} y={m.y + 4} text-anchor="middle">{m.n}</text></g>)}
+</svg>
+
+<style>
+  .abm { width: 100%; height: auto; overflow: visible; }
+  .e { fill: none; stroke: var(--line); stroke-width: 1.5; }
+  .nd rect { fill: var(--subtle); stroke: color-mix(in srgb, #3fb950 calc(var(--on, 0) * 100%), var(--line)); stroke-width: calc(1.2px + var(--on, 0) * 1px); transition: stroke .2s; }
+  .nd.mine rect { stroke: color-mix(in srgb, #3fb950 calc(40% + var(--on, 0) * 60%), var(--line)); }
+  .nd text { font: 600 13px var(--sans); fill: var(--fg); }
+  .nd circle { fill: #3fb950; }
+  .sub2 { font: 12px var(--sans); fill: var(--mute); }
+  .co circle { fill: #238636; stroke: var(--canvas); stroke-width: 2; }
+  .co text { font: 700 12px var(--mono); fill: #fff; }
+  @media (max-width: 600px) { .nd text { font-size: 16px; } .sub2 { display: none; } }
+</style>

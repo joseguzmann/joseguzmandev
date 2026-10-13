@@ -1,0 +1,119 @@
+---
+// Dentro de una experiencia: resumen, líneas que se abren y herramientas con logo. Diseño de la
+// línea elegido por Jose el 2026-10-13 (previews/role-lines-3, opción 2): sin etiqueta, flecha en
+// acento después del título, todas vienen cerradas (Jose, 2026-10-13) y sólo una queda abierta a la vez, con animación.
+import ToolLogos from './ToolLogos.astro';
+import { roleCommits } from '../../data/role-commits';
+interface Props { k: string; layout?: 'stack' | 'split' | 'gutter' | 'cards' | 'airy' | 'plain' }
+const { k, layout = 'stack' } = Astro.props;
+const d = roleCommits[k];
+const ChevD = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="m3.5 6 4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+---
+{d && (
+  <div class={`rc l-${layout}`}>
+    {layout === 'gutter' && <span class="gl mono">What</span>}
+    <p class="sum">{d.summary}</p>
+    {layout === 'gutter' && <span class="gl mono">Built</span>}
+    {layout === 'cards' ? (
+      <ul class="cards">{d.commits.map((c) => <li><span class="ti">{c.s}</span><span class="body">{c.body}</span></li>)}</ul>
+    ) : (
+      <ol class="cl">
+        {d.commits.map((c) => (
+          <li>
+            <details>
+              <summary><i class="mk" aria-hidden="true"></i><span class="ti">{c.s}</span><span class="cv" set:html={ChevD} /></summary>
+              <div class="bw"><p class="body">{c.body}</p></div>
+            </details>
+          </li>
+        ))}
+      </ol>
+    )}
+    {layout === 'gutter' && <span class="gl mono">Stack</span>}
+    <div class="tools">{layout !== 'gutter' && <span class="lbl mono">Built with</span>}<ToolLogos ids={d.tools} variant={layout === 'plain' || layout === 'split' ? 'line' : 'mini'} /></div>
+  </div>
+)}
+<script>
+  // Una sola línea abierta por experiencia: abrir otra cierra la anterior. El detalle se despliega
+  // y se recoge con una animación corta (igual que las experiencias en RunHistoryX), salvo que el
+  // sistema pida reducir movimiento.
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const running = new WeakMap<HTMLDetailsElement, Animation>();
+
+  function animate(d: HTMLDetailsElement, opening: boolean) {
+    const panel = d.querySelector<HTMLElement>(':scope > .bw');
+    running.get(d)?.cancel();
+    if (!panel || reduce.matches) { d.open = opening; return; }
+    if (opening) d.open = true;
+    const h = panel.scrollHeight;
+    const a = panel.animate(
+      opening
+        ? [{ height: '0px', opacity: 0, transform: 'translateY(-4px)' }, { height: `${h}px`, opacity: 1, transform: 'none' }]
+        : [{ height: `${h}px`, opacity: 1 }, { height: '0px', opacity: 0 }],
+      { duration: opening ? 220 : 160, easing: opening ? 'cubic-bezier(.2,.7,.2,1)' : 'ease-in' },
+    );
+    panel.style.overflow = 'hidden';
+    running.set(d, a);
+    a.onfinish = () => { panel.style.overflow = ''; running.delete(d); if (!opening) d.open = false; };
+  }
+
+  document.querySelectorAll<HTMLElement>('.rc .cl').forEach((list) => {
+    const rows = [...list.querySelectorAll<HTMLDetailsElement>(':scope > li > details')];
+    rows.forEach((d) => {
+      d.querySelector(':scope > summary')!.addEventListener('click', (e) => {
+        e.preventDefault();
+        const closing = d.open && !running.has(d);
+        if (closing) { animate(d, false); return; }
+        rows.forEach((o) => { if (o !== d && o.open) animate(o, false); });
+        animate(d, true);
+      });
+    });
+  });
+</script>
+
+<style>
+  .rc { display: grid; gap: 14px; }
+  .sum { color: #c9d1d9; font-size: 15.5px; }
+  .cl { display: grid; position: relative; }
+  .cl::before { content: ''; position: absolute; left: 4.5px; top: 18px; bottom: 18px; border-left: 1.5px solid var(--line); }
+  .cl li { border-bottom: 1px solid var(--line-2); }
+  .cl li:last-child { border-bottom: 0; }
+  .cl summary { list-style: none; cursor: pointer; display: flex; align-items: flex-start; gap: 12px; padding: 9px 6px 9px 0; border-radius: 6px; }
+  .cl summary::-webkit-details-marker { display: none; }
+  .cl summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .cl summary:hover .ti { color: #fff; }
+  .mk { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--inset); border: 2px solid #7d8590; position: relative; top: .42em; z-index: 1; transition: border-color .2s, background-color .2s; }
+  details[open] > summary .mk { border-color: var(--c, var(--accent)); background: var(--c, var(--accent)); }
+  .ti { font-weight: 600; font-size: 15px; color: var(--fg); transition: color .15s; }
+  .cv { flex: none; display: inline-flex; color: color-mix(in srgb, var(--c, var(--accent)) 75%, transparent); position: relative; top: .22em; transition: transform .24s cubic-bezier(.2,.7,.2,1), color .15s; }
+  details[open] > summary .cv { transform: rotate(180deg); }
+  .cl summary:hover .cv { color: var(--c, var(--accent)); }
+  .body { color: var(--mute); font-size: 14px; padding: 0 0 10px 21px; max-width: 72ch; }
+  .tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding-top: 14px; border-top: 1px solid var(--line-2); }
+  .lbl { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mute); }
+
+  /* split: resumen y stack a la izquierda, commits a la derecha */
+  .l-split { grid-template-columns: minmax(0, 300px) minmax(0, 1fr); grid-template-areas: 'sum cl' 'tools cl'; gap: 14px 40px; align-items: start; }
+  .l-split .sum { grid-area: sum; } .l-split .cl { grid-area: cl; } .l-split .tools { grid-area: tools; border-top: 0; padding-top: 0; flex-direction: column; align-items: flex-start; }
+  /* gutter: etiquetas en una columna a la izquierda, como un CV */
+  .l-gutter { grid-template-columns: 70px 1fr; gap: 14px 20px; align-items: start; }
+  .gl { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mute); padding-top: 4px; }
+  .l-gutter .tools { border-top: 0; padding-top: 0; }
+  /* cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+  .cards li { display: grid; gap: 6px; align-content: start; padding: 12px 14px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--subtle); }
+  .cards .body { padding: 0; font-size: 13px; }
+  /* airy: sin separadores, más aire */
+  .l-airy { gap: 20px; }
+  .l-airy .cl li { border: 0; }
+  .l-airy .cl summary { padding: 7px 0; }
+  .l-airy .cl { max-width: 720px; }
+  .l-airy .body { max-width: 64ch; line-height: 1.5; }
+  .l-airy .sum { font-size: 17px; color: var(--fg); }
+  .l-airy .tools { border-top: 0; padding-top: 4px; }
+  /* plain: herramientas como texto */
+  .l-plain .tools { border-top: 0; padding-top: 2px; }
+  @media (max-width: 760px) {
+    .l-split, .l-gutter { grid-template-columns: 1fr; grid-template-areas: none; }
+    .l-split > *, .l-split .sum, .l-split .cl, .l-split .tools { grid-area: auto; }
+  }
+</style>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Ícono cuadrado de Fwize armado a partir de su logotipo (Fw negro, barra roja): el repo no trae uno. -->
+  <rect width="256" height="256" fill="#ffffff"/>
+  <path d="M50 64h80v28H82v18h42v27H82v37H50z" fill="#0b0b0b"/>
+  <path d="M134 100l19 74 20-56 20 56 19-74" fill="none" stroke="#1b7fd1" stroke-width="24" stroke-linejoin="miter" stroke-miterlimit="2"/>
+  <rect x="50" y="190" width="162" height="12" fill="#d32f2f"/>
+</svg>

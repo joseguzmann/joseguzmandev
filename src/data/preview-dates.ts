@@ -17,11 +17,20 @@ export const fmt = (ym: string | null) => (ym ? label(mi(ym)) : 'present');
 /** Meses inclusive: 2024-01 → 2024-03 son 3. */
 export const months = (start: string, end: string | null) => mi(end ?? kit.asOf) - mi(start) + 1;
 
-export const duration = (start: string, end: string | null) => {
-  const n = months(start, end);
+/** 51 → '4 yrs 3 mos'. */
+export const spanText = (n: number) => {
   const y = Math.floor(n / 12);
   const m = n % 12;
   return [y && `${y} yr${y > 1 ? 's' : ''}`, m && `${m} mo${m > 1 ? 's' : ''}`].filter(Boolean).join(' ');
+};
+
+export const duration = (start: string, end: string | null) => spanText(months(start, end));
+
+/** Meses de experiencia sin contar dos veces los solapados (Dynecron corre en paralelo con otros). */
+export const totalMonths = (asOf = kit.asOf) => {
+  const seen = new Set<number>();
+  for (const e of kit.experience) for (let i = mi(e.start); i <= mi(e.end ?? asOf); i++) seen.add(i);
+  return seen.size;
 };
 
 /** Rango del eje: primer mes de experiencia → asOf. */

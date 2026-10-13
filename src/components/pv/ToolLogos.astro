@@ -1,0 +1,38 @@
+---
+// Logos + nombre de herramientas. variant: pill (fila de chips), tile (cuadrícula, logo arriba),
+// plain (logo + nombre sin borde).
+import { tool } from '../../data/tool-icons';
+interface Props { ids: string[]; variant?: 'pill' | 'tile' | 'plain' | 'mini' | 'line' }
+const { ids, variant = 'pill' } = Astro.props;
+const tools = ids.map(tool);
+---
+<ul class={`tl ${variant}`}>
+  {tools.map((t) => (
+    <li>
+      {t.path
+        ? <svg viewBox="0 0 24 24" aria-hidden="true" style={`fill:${t.color}`}><path d={t.path} /></svg>
+        : <span class="mono-ic" style={`color:${t.color}`} aria-hidden="true">{t.mono}</span>}
+      <span class="nm">{t.title}</span>
+    </li>
+  ))}
+</ul>
+<style>
+  .tl { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tl li { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: #c9d1d9; }
+  .tl svg { width: 15px; height: 15px; flex: none; }
+  .mono-ic { display: inline-grid; place-items: center; width: 15px; height: 15px; font: 700 8.5px var(--mono); border: 1.3px solid currentColor; border-radius: 4px; flex: none; }
+  .pill li { padding: 5px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--subtle); }
+  .plain { gap: 8px 18px; }
+  .mini { gap: 6px; }
+  .mini li { padding: 3px 9px 3px 7px; border-radius: 6px; background: var(--subtle); font-size: 12px; gap: 6px; }
+  .mini svg, .mini .mono-ic { width: 13px; height: 13px; }
+  .mini .mono-ic { font-size: 7px; border-radius: 3px; }
+  .line { gap: 6px 16px; }
+  .line li { font-size: 12.5px; color: var(--mute); gap: 6px; }
+  .line svg, .line .mono-ic { width: 13px; height: 13px; }
+  .line .mono-ic { font-size: 7px; border-radius: 3px; }
+  .tile { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+  .tile li { flex-direction: column; justify-content: center; gap: 8px; padding: 14px 6px 10px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--subtle); font-size: 12px; text-align: center; }
+  .tile svg, .tile .mono-ic { width: 26px; height: 26px; }
+  .tile .mono-ic { font-size: 12px; border-width: 2px; border-radius: 6px; }
+</style>

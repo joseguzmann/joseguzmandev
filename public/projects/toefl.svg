@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Provisorio: toefl-agents todavía no tiene ícono. -->
+  <rect x="24" y="24" width="208" height="208" rx="48" fill="#3b2a6b"/>
+  <circle cx="98" cy="112" r="26" fill="#c9b6ff"/><circle cx="158" cy="112" r="26" fill="#8f6cf0"/><circle cx="128" cy="160" r="26" fill="#e8deff"/>
+</svg>

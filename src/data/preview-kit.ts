@@ -8,8 +8,12 @@ export const kit = {
   sub: 'I build and run the systems a business works on every day — operations platforms, ERPs, and LLM agents that can only say what they can prove.',
   cta: 'Message me on LinkedIn',
   ctaHref: 'https://www.linkedin.com/in/joseguzmann/',
+  /** Reenvía al correo personal de Jose (alias en Namecheap; jurado del 2026-10-13 eligió hi@). */
+  email: 'hi@joseguzman.dev',
   work: [
     {
+      name: 'La Milésima',
+      logo: { src: '/systems/la-milesima.png', bg: '#000000' },
       title: 'The system an engine shop runs its front desk on',
       kind: 'Vehicle workshop · management system',
       figure: { value: '~$433k', label: 'USD invoiced through it' },
@@ -18,6 +22,8 @@ export const kit = {
       href: '/work/workshop-system/',
     },
     {
+      name: 'InnovoX',
+      logo: { src: '/systems/innovox.png', bg: '#1a3b2f' },
       title: 'Operations platform for an international freight forwarder',
       kind: 'Logistics · operations platform',
       figure: { value: '324', label: 'shipments in ~2.5 months' },
@@ -26,12 +32,16 @@ export const kit = {
       href: '/work/freight-operations/',
     },
     {
-      title: 'Making a sales agent stop making things up',
-      kind: 'LLM agents · reliability layer',
-      figure: { value: '13', label: 'eval suites, run on repeat' },
-      status: 'contract completed',
+      // Fwize (Dynecron); Jose lo pide como «versión beta todavía» (2026-10-13). Producción levantada y en onboarding (lectura del 2026-09-02):
+      // no hay uso real que contar todavía, así que la cifra es de ingeniería, no de tracción.
+      name: 'Fwize',
+      logo: { src: '/systems/fwize.svg', bg: '#ffffff' },
+      title: 'Multi-company ERP for an automotive service company',
+      kind: 'Automotive services · ERP with electronic invoicing',
+      figure: { value: '1,886', label: 'backend tests, plus 272 e2e specs' },
+      status: 'in beta',
       live: false,
-      href: '/work/llm-agent-reliability/',
+      beta: true,
     },
   ],
   // Experiencia: fechas tal cual el LinkedIn publicado. end: null = presente.
@@ -45,8 +55,17 @@ export const kit = {
     { org: 'Torre', role: 'Software Engineer Intern', start: '2023-05', end: '2023-12', note: 'First engineering role, on a platform with over a million users.' },
     { org: 'IQ Bit', role: 'Frontend & Mobile Developer', start: '2022-08', end: '2023-05', note: 'Four production apps across web and mobile, two in the app stores.' },
   ] as { org: string; role: string; start: string; end: string | null; note: string }[],
-  /** Mes de corte para "presente". */
-  asOf: '2026-10',
+  /** Página de cada empresa (se abre en otra pestaña). AI Dev Group no tiene; IQ Bit va a su LinkedIn. */
+  orgUrl: {
+    'Agents Booster': 'https://agentsbooster.com/',
+    Dynecron: 'https://www.dynecron.com/',
+    'Stack Builders': 'https://www.stackbuilders.com/',
+    Torre: 'https://torre.ai/',
+    'IQ Bit': 'https://www.linkedin.com/company/iq-bit/posts/',
+  } as Record<string, string>,
+  /** Mes de corte para "presente": el del build. En la página, un script lo recalcula con la fecha del
+   *  visitante, así que la duración de los trabajos en curso y el total no quedan viejos. */
+  asOf: new Date().toISOString().slice(0, 7),
   services: [
     'Custom business systems, end to end',
     'ERPs with accounting and electronic invoicing',
@@ -62,14 +81,16 @@ export const profile = {
   open: 'Open to remote',
   location: 'Quito, Ecuador',
   skills: [
-    { group: 'LLM systems', items: ['LangGraph', 'LangChain', 'Langchain4j', 'RAG and vector search (pgvector, Pinecone)', 'Agent evaluation (promptfoo)', 'Observability (Langfuse, LangSmith)', 'Tool design'] },
-    { group: 'Languages', items: ['Python', 'TypeScript', 'JavaScript', 'Scala', 'Java', 'SQL'] },
-    { group: 'Backend', items: ['FastAPI', 'Django', 'Flask', 'Play Framework', 'Node.js'] },
-    { group: 'Frontend', items: ['React', 'Next.js', 'Vue', 'Angular', 'React Native'] },
-    { group: 'Data & infra', items: ['AWS', 'Docker', 'PostgreSQL', 'MongoDB', 'Redis', 'RabbitMQ', 'Event-driven architecture', 'GitHub Actions'] },
+    { group: 'AI & LLM systems', ids: ['langgraph', 'langchain', 'langchain4j', 'pgvector', 'pinecone', 'promptfoo', 'langfuse', 'langsmith'], items: ['LangGraph', 'LangChain', 'Langchain4j', 'RAG and vector search (pgvector, Pinecone)', 'Agent evaluation (promptfoo)', 'Observability (Langfuse, LangSmith)', 'Tool design'] },
+    { group: 'Languages', ids: ['python', 'typescript', 'javascript', 'scala', 'java', 'sql'], items: ['Python', 'TypeScript', 'JavaScript', 'Scala', 'Java', 'SQL'] },
+    { group: 'Backend', ids: ['fastapi', 'django', 'flask', 'playframework', 'node'], items: ['FastAPI', 'Django', 'Flask', 'Play Framework', 'Node.js'] },
+    { group: 'Frontend', ids: ['react', 'next', 'vue', 'angular', 'reactnative'], items: ['React', 'Next.js', 'Vue', 'Angular', 'React Native'] },
+    { group: 'Data & infra', ids: ['postgresql', 'mongodb', 'redis', 'rabbitmq', 'docker', 'aws', 'githubactions'], items: ['AWS', 'Docker', 'PostgreSQL', 'MongoDB', 'Redis', 'RabbitMQ', 'Event-driven architecture', 'GitHub Actions'] },
   ],
-  education: { degree: 'B.Eng. in Computer Science', school: 'Escuela Politécnica Nacional', place: 'Quito, Ecuador', date: 'Oct 2025' },
-  spoken: ['Spanish (native)', 'English (EF SET C2)'],
+  education: { degree: 'B.Eng. in Computer Science', school: 'Escuela Politécnica Nacional', place: 'Quito, Ecuador', date: 'Oct 2025', logo: '/edu/epn.png' },
+  spoken: ['Spanish (native)', 'English (C1)'],
+  // Con bandera, para el pie de Skills (las previews viejas siguen usando `spoken`).
+  languages: [{ name: 'Spanish', level: 'Native', flag: '/flags/es.svg' }, { name: 'English', level: 'C1', flag: '/flags/us.svg' }],
 };
 
 export type Highlight = { title: string; detail: string; figure?: string; href?: string };

@@ -2,10 +2,11 @@
 // Variantes de RunHistory: mismo esquema —estado, rol, fechas, barra en el eje real y despliegue al grafo—
 // con un cambio puntual por interruptor. El home usa text 'b' + logos (elegido por Jose el 2026-10-12).
 import RoleGraph from './RoleGraph.astro';
+import RoleCommits from './RoleCommits.astro';
 import { kit, orgColor } from '../../data/preview-kit';
 import { mi, fmt, duration, axisStart, axisEnd, axisLen, axisYears, expByRecent } from '../../data/preview-dates';
 
-export type Flags = { text?: 'a' | 'b' | 'c' | 'd' | 'e' | 'f'; logo?: boolean; chev?: boolean; now?: boolean; orgFirst?: boolean; durIn?: boolean; live?: boolean; compact?: boolean; bands?: boolean; rail?: boolean };
+export type Flags = { text?: 'a' | 'b' | 'c' | 'd' | 'e' | 'f'; logo?: boolean; chev?: boolean; now?: boolean; orgFirst?: boolean; durIn?: boolean; live?: boolean; compact?: boolean; bands?: boolean; rail?: boolean; commits?: boolean; panel?: string };
 interface Props { f: Flags; /** Empresa cuyo rol aparece abierto al cargar. */ openOrg?: string }
 const { f, openOrg } = Astro.props;
 const pos = (m: number) => ((m - axisStart) / axisLen) * 100;
@@ -28,7 +29,7 @@ const logoSrc = (org: string) => {
 const bands = axisYears.map((y, i) => ({ l: yx(y), w: (i < axisYears.length - 1 ? yx(axisYears[i + 1]) : 100) - yx(y), alt: i % 2 === 1 }));
 ---
 
-<div class:list={['history', { compact: f.compact, rail: f.rail, wide: f.logo, 'wide-c': f.text === 'c' }]}>
+<div class:list={['history', f.panel && `p-${f.panel}`, { compact: f.compact, rail: f.rail, wide: f.logo, 'wide-c': f.text === 'c' }]}>
   <div class="h-axis mono" aria-hidden="true"><span></span><span class="ax">{axisYears.map((y) => <i style={`left:${yx(y)}%`}>{y}</i>)}{f.now && <i class="nowl" style={`left:${today}%`}>now</i>}</span><span></span></div>
   {expByRecent.map((r) => (
     <details class="hrow" style={`--c:${orgColor[r.org]}`} open={r.org === openOrg}>
@@ -48,7 +49,7 @@ const bands = axisYears.map((y, i) => ({ l: yx(y), w: (i < axisYears.length - 1 
             const dur = duration(r.start, r.end);
             switch (f.text) {
               case 'a': return <span class="tx"><span class="h-t"><strong>{r.org}</strong></span><span class="small">{base}{kind && <> · {kind}</>} · <span class="mono">{when}</span></span></span>;
-              case 'b': return <span class="tx"><span class="h-t"><strong>{base}</strong> <span class="at">at {r.org}</span></span><span class="small mono">{when} · {dur}</span></span>;
+              case 'b': return <span class="tx"><span class="h-t"><strong>{base}</strong> <span class="at">at {kit.orgUrl[r.org] ? <a class="org" href={kit.orgUrl[r.org]} target="_blank" rel="noopener noreferrer">{r.org}</a> : r.org}</span></span><span class="small mono">{when} · <span class="dur" data-start={r.start} data-end={r.end ?? ''}>{dur}</span></span></span>;
               case 'c': return <span class="tx"><span class="eyebrow-org mono">{r.org}</span><span class="h-t"><strong>{base}</strong>{kind && <span class="chip">{kind}</span>}</span></span>;
               case 'd': return <span class="tx"><span class="h-t"><strong>{base}</strong>{kind && <span class="chip">{kind}</span>}</span><span class="small">{r.org} · <span class="mono">{dur}</span></span></span>;
               case 'e': return <span class="tx"><span class="h-t"><strong>{r.org}</strong> <span class="at">· {base}</span></span><span class="small mono">{when}{kind && <> · {kind.toLowerCase()}</>}</span></span>;
@@ -76,12 +77,52 @@ const bands = axisYears.map((y, i) => ({ l: yx(y), w: (i < axisYears.length - 1 
           : <span class="chev mono small" aria-hidden="true">▾</span>}
       </summary>
       <div class="h-graph">
-        <p class="small">{r.note}</p>
-        <RoleGraph role={r} hideSource />
+        {f.panel === 'r' && <i class="drop" aria-hidden="true" style={`left:calc(${pos(mi(r.start))}% )`}></i>}
+        {f.commits ? <RoleCommits k={`${r.org}|${r.role}`} layout={({ k: 'split', n: 'gutter', o: 'cards', p: 'airy', s: 'plain', m: 'airy', q: 'airy' } as Record<string, any>)[f.panel ?? ''] ?? (f.panel?.startsWith('p') || f.panel?.startsWith('q') ? 'airy' : 'stack')} /> : <><p class="small">{r.note}</p><RoleGraph role={r} hideSource /></>}
       </div>
     </details>
   ))}
 </div>
+
+<script>
+  // Acordeón animado: un solo rol abierto a la vez; el panel se despliega y se recoge con una
+  // animación breve (sin animación si el sistema pide reducir movimiento).
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const running = new WeakMap<HTMLDetailsElement, Animation>();
+
+  function animate(d: HTMLDetailsElement, opening: boolean) {
+    const panel = d.querySelector<HTMLElement>(':scope > .h-graph');
+    running.get(d)?.cancel();
+    if (!panel || reduce.matches) { d.open = opening; return; }
+    if (opening) d.open = true;
+    const h = panel.scrollHeight;
+    const a = panel.animate(
+      opening
+        ? [{ height: '0px', opacity: 0, transform: 'translateY(-6px)' }, { height: `${h}px`, opacity: 1, transform: 'none' }]
+        : [{ height: `${h}px`, opacity: 1 }, { height: '0px', opacity: 0 }],
+      { duration: opening ? 240 : 170, easing: opening ? 'cubic-bezier(.2,.7,.2,1)' : 'ease-in' },
+    );
+    panel.style.overflow = 'hidden';
+    running.set(d, a);
+    a.onfinish = () => { panel.style.overflow = ''; running.delete(d); if (!opening) d.open = false; };
+  }
+
+  document.querySelectorAll<HTMLElement>('.history').forEach((h) => {
+    const rows = [...h.querySelectorAll<HTMLDetailsElement>(':scope > details.hrow')];
+    rows.forEach((d) => {
+      d.querySelector(':scope > summary')!.addEventListener('click', (e) => {
+        // El nombre de la empresa es un link a su página: que abra la pestaña sin abrir el rol.
+        if ((e.target as Element).closest('a')) return;
+        e.preventDefault();
+        const willOpen = !d.open || running.has(d);
+        if (willOpen && d.open && running.has(d)) { animate(d, true); return; }
+        if (!willOpen) { animate(d, false); return; }
+        rows.forEach((o) => { if (o !== d && o.open) animate(o, false); });
+        animate(d, true);
+      });
+    });
+  });
+</script>
 
 <style>
   .history { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
@@ -99,6 +140,11 @@ const bands = axisYears.map((y, i) => ({ l: yx(y), w: (i < axisYears.length - 1 
   .h-main { display: grid; gap: 2px; min-width: 0; }
   .h-t { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .at { color: var(--mute); }
+  /* Que se note que es un link sin gritarlo: subrayado tenue y una flechita; en hover, acento. */
+  .org { color: inherit; position: relative; z-index: 1; text-decoration: underline; text-decoration-color: rgb(145 152 161 / .35); text-decoration-thickness: 1px; text-underline-offset: 3px; transition: color .15s, text-decoration-color .15s; }
+  .org::after { content: '↗'; display: inline-block; text-decoration: none; font-size: .8em; margin-left: 3px; opacity: .55; transition: opacity .15s; }
+  .org:hover { color: var(--accent); text-decoration-color: currentColor; }
+  .org:hover::after { opacity: 1; }
   .tx { display: grid; gap: 2px; min-width: 0; }
   /* Con logo, la columna de texto necesita más lugar. */
   .wide .h-axis, .wide .hrow summary { grid-template-columns: 24px minmax(0, 430px) 1fr 20px; }
@@ -153,4 +199,107 @@ const bands = axisYears.map((y, i) => ({ l: yx(y), w: (i < axisYears.length - 1 
     .h-t { white-space: normal; }
   }
   @media (prefers-reduced-motion: reduce) { .spin, .pulse { animation: none; } }
+
+  /* Variantes del panel abierto (preview experience-panel) */
+  .p-a .h-graph { background: var(--inset); border-top: 0; box-shadow: inset 3px 0 0 var(--c); padding-left: 104px; }
+  .p-b .h-graph { background: transparent; border-top: 0; padding: 6px 18px 20px 104px; }
+  .p-b .h-graph > :global(.rc) { border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; background: var(--subtle); }
+  .p-c .h-graph { position: relative; border-top: 0; padding-left: 104px; }
+  .p-c .h-graph::before { content: ''; position: absolute; left: 76px; top: 0; bottom: 22px; border-left: 2px solid var(--c); border-radius: 2px; }
+  .p-c .hrow[open] summary { box-shadow: inset 0 -1px 0 transparent; }
+  .p-d .h-graph { background: color-mix(in srgb, var(--c) 6%, var(--canvas)); border-top: 1px solid color-mix(in srgb, var(--c) 45%, transparent); padding-left: 104px; }
+  .p-e .hrow[open] { box-shadow: inset 3px 0 0 var(--c); }
+  .p-e .h-graph { border-top: 0; padding-left: 104px; background: var(--canvas); }
+  .p-e .hrow[open] summary { background: color-mix(in srgb, var(--c) 8%, var(--subtle)); }
+  .p-f .hrow[open] { margin: 10px 8px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: 0 8px 30px rgb(0 0 0 / .45); }
+  .p-f .h-graph { border-top: 1px solid var(--line-2); padding-left: 104px; }
+  .p-g .h-graph { border-top: 0; padding: 4px 18px 26px 104px; background: var(--inset); }
+  .p-g .h-graph::before { content: 'What I built'; font: 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--c); }
+  .p-h .h-graph { background: var(--inset); border-top: 0; padding: 20px 18px 24px 104px; box-shadow: inset 0 10px 12px -10px rgb(0 0 0 / .8), inset 0 -10px 12px -10px rgb(0 0 0 / .8); }
+  .p-i .h-graph { border-top: 0; padding: 4px 18px 22px 104px; background: transparent; }
+  .p-i .h-graph > :global(.rc) { border-left: 2px solid color-mix(in srgb, var(--c) 60%, transparent); padding-left: 20px; }
+  .p-i .hrow[open] summary { background: transparent; }
+  .p-j .hrow[open] { background: var(--subtle); }
+  .p-j .hrow[open] summary { background: transparent; }
+  .p-j .h-graph { border-top: 0; padding: 0 18px 22px 104px; background: transparent; }
+  .p-j .hrow[open] + .hrow { border-top: 6px solid var(--canvas); }
+  @media (max-width: 760px) {
+    .history[class*='p-'] .h-graph { padding-left: 18px; }
+    .p-c .h-graph::before { left: 8px; } .p-c .h-graph { padding-left: 24px; }
+    .p-b .h-graph > :global(.rc) { padding: 14px; }
+  }
+
+  /* Segunda tanda */
+  .p-k .h-graph, .p-l .h-graph, .p-m .h-graph, .p-n .h-graph, .p-o .h-graph, .p-p .h-graph, .p-q .h-graph, .p-r .h-graph, .p-s .h-graph, .p-t .h-graph { border-top: 0; background: transparent; padding: 18px 18px 26px 104px; }
+  /* K: dos columnas */
+  .p-k .hrow[open] { background: var(--inset); }
+  /* L: los demás roles se atenúan */
+  .p-l .history, .p-l { }
+  .p-l:has(.hrow[open]) .hrow:not([open]) summary { opacity: .45; transition: opacity .2s; }
+  .p-l:has(.hrow[open]) .hrow:not([open]) summary:hover { opacity: 1; }
+  .p-l .hrow[open] summary { background: transparent; }
+  /* M: atenuado + aire */
+  .p-m:has(.hrow[open]) .hrow:not([open]) summary { opacity: .45; }
+  .p-m .hrow[open] { margin: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--inset); }
+  .p-m .hrow[open] summary { background: transparent; }
+  /* N: etiquetas en el margen, como CV */
+  .p-n .hrow[open] summary { background: transparent; }
+  .p-n .h-graph { padding-left: 34px; }
+  /* O: tarjetas */
+  .p-o .hrow[open] { background: var(--inset); }
+  .p-o .hrow[open] summary { background: transparent; }
+  /* P: aire, sin separadores */
+  .p-p .hrow[open] { padding-bottom: 8px; }
+  .p-p .hrow[open] summary { background: transparent; border-bottom: 1px solid var(--line-2); }
+  /* Q: el rol abierto crece */
+  .p-q .hrow[open] summary { background: transparent; min-height: 84px; }
+  .p-q .hrow[open] summary :global(strong) { font-size: 20px; }
+  .p-q .hrow[open] { background: linear-gradient(var(--subtle), var(--canvas) 140px); }
+  /* R: la barra del gantt cae hacia el panel */
+  .p-r .h-graph { position: relative; background: var(--inset); }
+  .p-r .hrow[open] summary { background: var(--inset); }
+  .drop { display: none; }
+  /* S: plano, stack como texto */
+  .p-s .hrow[open] summary { background: transparent; }
+  .p-s .hrow[open] { border-bottom: 2px solid var(--line); }
+  /* T: pestaña de carpeta */
+  .p-t .hrow[open] { margin: 8px 0 14px; }
+  .p-t .hrow[open] summary { background: var(--subtle); border-radius: 12px 12px 0 0; border: 1px solid var(--line); border-bottom: 0; }
+  .p-t .h-graph { background: var(--subtle); border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px; }
+  @media (max-width: 760px) { .p-n .h-graph { padding-left: 18px; } }
+
+  /* Tercera tanda: la P con lo de adentro distinguido por color */
+  .history[class*='p-p'] .hrow[open] summary { background: transparent; }
+  .history[class*='p-p'] .h-graph { border-top: 0; padding: 22px 18px 28px 104px; }
+  .p-p1 .h-graph { background: var(--inset); }
+  .p-p2 .hrow[open] { background: var(--subtle); }
+  .p-p2 .h-graph { background: transparent; border-top: 1px solid var(--line-2); }
+  .p-p3 .h-graph { background: color-mix(in srgb, var(--c) 7%, var(--canvas)); }
+  .p-p4 .h-graph { background: var(--inset); box-shadow: inset 3px 0 0 var(--c); }
+  .p-p5 .h-graph { background: transparent; padding: 4px 18px 20px 104px; }
+  .p-p5 .h-graph > :global(.rc) { background: var(--subtle); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; }
+  .p-p6 .h-graph { background: linear-gradient(color-mix(in srgb, var(--c) 12%, var(--canvas)), var(--canvas) 70%); }
+  .p-p7 .h-graph { background: var(--inset); border-top: 2px solid var(--c); }
+  .history.p-p8 .hrow[open] summary { background: color-mix(in srgb, var(--c) 22%, var(--subtle)); }
+  .p-p8 .h-graph { background: var(--inset); }
+  .p-p9 .h-graph { background: transparent; padding: 4px 18px 20px 104px; }
+  .p-p9 .h-graph > :global(.rc) { background: var(--inset); border: 1px solid color-mix(in srgb, var(--c) 40%, var(--line)); border-radius: 12px; padding: 20px 22px; }
+  .p-p10 .h-graph { background: var(--inset) radial-gradient(color-mix(in srgb, var(--c) 18%, transparent) 1px, transparent 1px) 0 0 / 18px 18px; }
+  @media (max-width: 760px) { .history[class*='p-p'] .h-graph { padding-left: 16px; padding-right: 16px; } }
+
+  /* Cuarta tanda: fondos sobre la P10 (oscuro). --dc: color del patrón */
+  .history[class*='p-q'] .hrow[open] summary { background: transparent; }
+  .history[class*='p-q'] .h-graph { border-top: 0; padding: 22px 18px 28px 104px; background-color: var(--inset); --dc: color-mix(in srgb, var(--c) 22%, transparent); --gc: color-mix(in srgb, var(--c) 12%, transparent); }
+  .p-q1 .h-graph { background-image: radial-gradient(rgb(255 255 255 / .09) 1px, transparent 1px); background-size: 18px 18px; }
+  .p-q2 .h-graph { background-image: radial-gradient(var(--dc) 1px, transparent 1px); background-size: 10px 10px; }
+  .p-q3 .h-graph { background-image: radial-gradient(color-mix(in srgb, var(--c) 40%, transparent) 2px, transparent 2px); background-size: 30px 30px; }
+  .p-q4 .h-graph { background-image: linear-gradient(var(--gc) 1px, transparent 1px), linear-gradient(90deg, var(--gc) 1px, transparent 1px); background-size: 24px 24px; }
+  .p-q5 .h-graph { background-image: linear-gradient(rgb(255 255 255 / .035) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / .035) 1px, transparent 1px), linear-gradient(var(--gc) 1px, transparent 1px), linear-gradient(90deg, var(--gc) 1px, transparent 1px); background-size: 12px 12px, 12px 12px, 60px 60px, 60px 60px; }
+  .p-q6 .h-graph { background-image: repeating-linear-gradient(135deg, var(--gc) 0 1px, transparent 1px 12px); }
+  .p-q7 .h-graph { background-image: linear-gradient(var(--dc), var(--dc)), linear-gradient(var(--dc), var(--dc)); background-size: 9px 1px, 1px 9px; background-position: 0 4px, 4px 0; background-repeat: no-repeat; }
+  .p-q7 .h-graph { background: var(--inset) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M13 9v8M9 13h8' stroke='%23ab7df8' stroke-opacity='.28' stroke-width='1'/%3E%3C/svg%3E"); }
+  .p-q8 .h-graph { background-image: radial-gradient(ellipse at 80% 0%, color-mix(in srgb, var(--c) 16%, transparent), transparent 60%), radial-gradient(var(--dc) 1px, transparent 1px); background-size: auto, 18px 18px; }
+  .p-q9 .h-graph { background-image: linear-gradient(var(--gc) 1px, transparent 1px); background-size: 100% 26px; }
+  .p-q10 .h-graph { background-image: linear-gradient(90deg, var(--inset) 15%, transparent 70%), radial-gradient(color-mix(in srgb, var(--c) 40%, transparent) 1.2px, transparent 1.2px); background-size: auto, 16px 16px; }
+  @media (max-width: 760px) { .history[class*='p-q'] .h-graph { padding-left: 16px; padding-right: 16px; } }
 </style>

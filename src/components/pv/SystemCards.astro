@@ -1,0 +1,47 @@
+---
+// «Live systems I built»: una tarjeta por sistema, con su ícono cuadrado (favicon del sistema; el de Fwize se armó a partir de su logotipo), la cifra
+// grande y el estado. Diseño elegido por Jose el 2026-10-13 (previews/systems-1, opción 2).
+import { kit } from '../../data/preview-kit';
+import { caseHref } from '../../data/case-links';
+// link: enlazar a los casos de estudio (apagado: son sistemas privados de clientes, Jose 2026-10-13).
+// cardNote: línea gris opcional al pie de cada tarjeta.
+interface Props { link?: boolean; cardNote?: string }
+const { link = false, cardNote } = Astro.props;
+---
+
+<ul class="systems">
+  {kit.work.map((w) => {
+    const href = link ? caseHref((w as { href?: string }).href) : undefined;
+    return (
+      <li class="sys">
+        <img class="icon" src={w.logo.src} width="64" height="64" alt={`${w.name} logo`} style={`background:${w.logo.bg}`} loading="lazy" />
+        <h3>{href ? <a href={href}>{w.name}</a> : w.name}</h3>
+        <p class="what">{w.title}</p>
+        <p class="small">{w.kind}</p>
+        <p class="fig"><strong>{w.figure.value}</strong><span class="small">{w.figure.label}</span></p>
+        <p class:list={['badge', { live: w.live, beta: (w as { beta?: boolean }).beta }]}><i aria-hidden="true"></i>{w.status}</p>
+        {cardNote && <p class="cnote small">{cardNote}</p>}
+      </li>
+    );
+  })}
+</ul>
+
+<style>
+  .systems { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .sys { position: relative; display: grid; gap: 6px; align-content: start; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--subtle); transition: border-color .15s; }
+  .sys:hover { border-color: var(--mute); }
+  .icon { width: 64px; height: 64px; border-radius: 16px; object-fit: cover; margin-bottom: 12px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .12), 0 0 0 1px rgb(255 255 255 / .06); }
+  .sys h3 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+  .sys h3 a { color: var(--fg); text-decoration: none; }
+  .sys h3 a::after { content: ''; position: absolute; inset: 0; border-radius: 14px; }
+  .sys h3 a:hover { color: var(--accent); }
+  .what { color: #c9d1d9; font-size: 15px; line-height: 1.4; }
+  .fig { display: grid; padding-top: 12px; margin-top: 8px; border-top: 1px solid var(--line-2); }
+  .fig strong { font-size: 30px; letter-spacing: -0.02em; line-height: 1.1; }
+  .badge { margin-top: 6px; }
+  .badge:not(.live):not(.beta) i { display: none; }
+  .badge.beta { color: var(--warn); border-color: rgb(210 153 34 / .4); background: rgb(210 153 34 / .1); }
+  .badge.beta i { width: 7px; height: 7px; border-radius: 50%; background: var(--warn); }
+  .cnote { padding-top: 10px; }
+  @media (max-width: 860px) { .systems { grid-template-columns: 1fr; } }
+</style>
