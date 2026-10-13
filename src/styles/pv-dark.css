@@ -63,7 +63,7 @@ a { color: inherit; }
 .pv-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding-top: 40px; font: 12px var(--mono); color: var(--mute); }
 
 @media (max-width: 760px) {
-  .wrap { padding: 0 16px; }
+  .wrap { padding-inline: 16px; }
   .pv-top nav, .pv-top .btn { display: none; }
   .pv-hero { padding-top: 40px; }
 }
