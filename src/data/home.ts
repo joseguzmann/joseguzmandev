@@ -44,12 +44,12 @@ export const process = [
 ];
 
 export const bio = [
-  'I’m a software engineer in Quito, and co-founder of Dynecron. I build the systems a business runs its day on — and then I own them after they ship.',
+  'I’m a software engineer in Quito. I build the systems a business runs its day on — and then I own them after they ship.',
   'With AI, my work is the part underneath the model: making sure an agent can’t tell your customer something it can’t prove. Most of what breaks in an AI product isn’t the model.',
 ];
 
 export const experience = [
-  { org: 'Dynecron', role: 'Co-Founder & Lead Software Engineer', when: '2024 – now' },
+  { org: 'Dynecron', role: 'Lead Software Engineer', when: '2024 – 2026' },
   { org: 'Agents Booster', role: 'AI Engineer', when: '2026' },
   { org: 'Stack Builders', role: 'Software Developer', when: '2025 – 2026' },
   { org: 'Torre', role: 'Software Engineer', when: '2023 – 2025' },
