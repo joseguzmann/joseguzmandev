@@ -3,5 +3,12 @@
   "framework": "astro",
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm build",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/r/:code",
+      "destination": "/?r=:code",
+      "permanent": false
+    }
+  ]
 }
