@@ -47,7 +47,7 @@ export const kit = {
   // Experiencia: fechas tal cual el LinkedIn publicado. end: null = presente.
   // Agents Booster va como contrato (decisión de Jose del 2026-09-23).
   experience: [
-    { org: 'Dynecron', role: 'Lead Software Engineer', start: '2024-01', end: '2026-10', note: 'Projects end to end, teams of up to five.' },
+    { org: 'Dynecron', role: 'Lead Software Engineer · part-time', start: '2024-01', end: null, note: 'Co-founded software company, run part-time alongside full-time roles. Projects end to end, teams of up to five.' },
     { org: 'Agents Booster', role: 'AI Engineer · contract', start: '2026-05', end: '2026-08', note: 'Reliability layer, evals and tracing for LLM sales agents.' },
     { org: 'Stack Builders', role: 'Software Developer', start: '2025-05', end: '2026-05', note: 'Software consultancy serving international clients.' },
     { org: 'Torre', role: 'Software Engineer', start: '2024-06', end: '2025-04', note: 'Process layer under a multi-agent LLM hiring system.' },
@@ -87,7 +87,7 @@ export const profile = {
     { group: 'Frontend', ids: ['react', 'next', 'vue', 'angular', 'reactnative'], items: ['React', 'Next.js', 'Vue', 'Angular', 'React Native'] },
     { group: 'Data & infra', ids: ['postgresql', 'mongodb', 'redis', 'rabbitmq', 'docker', 'aws', 'githubactions'], items: ['AWS', 'Docker', 'PostgreSQL', 'MongoDB', 'Redis', 'RabbitMQ', 'Event-driven architecture', 'GitHub Actions'] },
   ],
-  education: { degree: 'B.Eng. in Computer Science', school: 'Escuela Politécnica Nacional', place: 'Quito, Ecuador', date: 'Oct 2025', logo: '/edu/epn.png' },
+  education: { degree: 'B.Eng. in Computer Science', school: 'Escuela Politécnica Nacional', place: 'Quito, Ecuador', date: '', logo: '/edu/epn.png' },
   spoken: ['Spanish (native)', 'English (C1)'],
   // Con bandera, para el pie de Skills (las previews viejas siguen usando `spoken`).
   languages: [{ name: 'Spanish', level: 'Native', flag: '/flags/es.svg' }, { name: 'English', level: 'C1', flag: '/flags/us.svg' }],
@@ -99,7 +99,7 @@ export type Highlight = { title: string; detail: string; figure?: string; href?:
 // (perfil de LinkedIn publicado) y, para Dynecron, el material de casos.
 // Clave: "org|role" de kit.experience.
 export const highlights: Record<string, Highlight[]> = {
-  'Dynecron|Lead Software Engineer': [
+  'Dynecron|Lead Software Engineer · part-time': [
     { title: 'Workshop management system', detail: 'Running since Jul 2025, later a white-label product', figure: '971 work orders', href: '/work/workshop-system/' },
     { title: 'Freight forwarder operations platform', detail: 'Nine people run their day on it', figure: '324 shipments', href: '/work/freight-operations/' },
     { title: 'Multi-company ERP with e-invoicing', detail: 'Onboarding its first company', figure: '1,886 backend tests', href: '/work/multi-company-erp/' },

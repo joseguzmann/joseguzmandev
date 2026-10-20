@@ -7,9 +7,9 @@ export type Commit = { type?: 'feat' | 'test' | 'fix' | 'refactor' | 'perf' | 'd
 export type RoleCommits = { summary: string; commits: Commit[]; tools: string[] };
 
 export const roleCommits: Record<string, RoleCommits> = {
-  'Dynecron|Lead Software Engineer': {
+  'Dynecron|Lead Software Engineer · part-time': {
     // Opción combinada de previews/job-lines (elegida por Jose el 2026-10-13).
-    summary: 'Software company building custom business systems for clients in Ecuador. I ran projects end to end, from the first meeting to deployment, and shared the technical lead on each one with another senior engineer.',
+    summary: 'Software company I co-founded and run part-time alongside my full-time roles, building custom business systems for clients in Ecuador. I run projects end to end, from the first meeting to deployment, and share the technical lead on each one with another senior engineer.',
     commits: [
       { s: 'Co-built the system an engine workshop has run on since July 2025', body: '971 work orders and ~USD 433,000 invoiced through it. I worked on it from the contract to the Docker deploy.' },
       { s: 'Co-built the operations platform a freight forwarder runs daily', body: 'Nine people ran 324 shipments on it in its first ~2.5 months. Shipment data is pulled from PDFs with AI.' },

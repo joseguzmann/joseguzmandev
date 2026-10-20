@@ -43,8 +43,8 @@ export const axisYears = Array.from(
   (_, k) => Math.floor(axisStart / 12) + k,
 );
 
-/** Experiencia ordenada por inicio, la más reciente primero. */
-export const expByRecent = [...kit.experience].sort((a, b) => mi(b.start) - mi(a.start));
+/** Experiencia: los roles vigentes primero (como en el CV), después por inicio, la más reciente primero. */
+export const expByRecent = [...kit.experience].sort((a, b) => Number(a.end !== null) - Number(b.end !== null) || mi(b.start) - mi(a.start));
 
 /** "running since Jul 2025" → índice de mes, o null. */
 export const runningSince = (status: string) => {

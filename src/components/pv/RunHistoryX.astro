@@ -49,7 +49,7 @@ const bands = axisYears.map((y, i) => ({ l: yx(y), w: (i < axisYears.length - 1 
             const dur = duration(r.start, r.end);
             switch (f.text) {
               case 'a': return <span class="tx"><span class="h-t"><strong>{r.org}</strong></span><span class="small">{base}{kind && <> · {kind}</>} · <span class="mono">{when}</span></span></span>;
-              case 'b': return <span class="tx"><span class="h-t"><strong>{base}</strong> <span class="at">at {kit.orgUrl[r.org] ? <a class="org" href={kit.orgUrl[r.org]} target="_blank" rel="noopener noreferrer">{r.org}</a> : r.org}</span></span><span class="small mono">{when} · <span class="dur" data-start={r.start} data-end={r.end ?? ''}>{dur}</span></span></span>;
+              case 'b': return <span class="tx"><span class="h-t"><strong>{base}</strong> <span class="at">at {kit.orgUrl[r.org] ? <a class="org" href={kit.orgUrl[r.org]} target="_blank" rel="noopener noreferrer">{r.org}</a> : r.org}</span></span><span class="small mono">{when} · <span class="dur" data-start={r.start} data-end={r.end ?? ''}>{dur}</span>{kind && <> · {kind}</>}</span></span>;
               case 'c': return <span class="tx"><span class="eyebrow-org mono">{r.org}</span><span class="h-t"><strong>{base}</strong>{kind && <span class="chip">{kind}</span>}</span></span>;
               case 'd': return <span class="tx"><span class="h-t"><strong>{base}</strong>{kind && <span class="chip">{kind}</span>}</span><span class="small">{r.org} · <span class="mono">{dur}</span></span></span>;
               case 'e': return <span class="tx"><span class="h-t"><strong>{r.org}</strong> <span class="at">· {base}</span></span><span class="small mono">{when}{kind && <> · {kind.toLowerCase()}</>}</span></span>;

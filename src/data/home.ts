@@ -49,7 +49,7 @@ export const bio = [
 ];
 
 export const experience = [
-  { org: 'Dynecron', role: 'Lead Software Engineer', when: '2024 – 2026' },
+  { org: 'Dynecron', role: 'Lead Software Engineer · part-time', when: '2024 – present' },
   { org: 'Agents Booster', role: 'AI Engineer', when: '2026' },
   { org: 'Stack Builders', role: 'Software Developer', when: '2025 – 2026' },
   { org: 'Torre', role: 'Software Engineer', when: '2023 – 2025' },

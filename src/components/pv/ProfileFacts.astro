@@ -18,7 +18,7 @@ const ed = profile.education;
     ))}
   </ul>
   <div class="foot">
-    <p class="ed"><img class="ic" src={ed.logo} width="34" height="34" alt="Escuela Politécnica Nacional" loading="lazy" /><span><strong>{ed.degree}</strong><span class="dim small"> · {ed.school} · {ed.date}</span></span></p>
+    <p class="ed"><img class="ic" src={ed.logo} width="34" height="34" alt="Escuela Politécnica Nacional" loading="lazy" /><span><strong>{ed.degree}</strong><span class="dim small"> · {ed.school}{ed.date && ` · ${ed.date}`}</span></span></p>
     <p class="lg">
       {profile.languages.map((l) => (
         <span class="lp"><img src={l.flag} width="21" height="14" alt="" loading="lazy" /><b>{l.name}</b> <span class="lv">{l.level}</span></span>
