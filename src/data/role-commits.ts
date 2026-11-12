@@ -24,11 +24,11 @@ export const roleCommits: Record<string, RoleCommits> = {
     // Opción 1 de previews/role-lines (elegida por Jose el 2026-10-13): cada línea es algo que él hizo.
     summary: 'AI Engineer on a platform where businesses build AI sales agents for WhatsApp, Instagram and Messenger. I focused on the agent’s reliability, and worked across the backend, web console and mobile app around it.',
     commits: [
-      { s: 'Started the eval suite for the agent, and wrote most of it', body: 'Each scenario runs 3 to 8 times with custom Python assertions, so I measure pass rates, not a single pass.' },
+      { s: 'Started the eval suite for the agent, and wrote most of it', body: 'Scenarios run with repetition and custom Python assertions, so I measure pass rates, not a single pass.' },
       { s: 'Built the leads, calendar and resources modules from scratch', body: 'None of them existed before I joined.' },
       { s: 'Brought automated testing to a web console that had none', body: '24 end-to-end specs. The first one reproduced a bug before the fix went in.' },
       { s: 'Tracked a payment bug down through the traces', body: 'I had added Langfuse. The trace showed no AI call, so the fix went in the webhook, not the prompt.' },
-      { s: 'Replaced ~25 text-parsing hacks with typed output', body: 'Rolled out in phases behind a flag, without stopping feature work.' },
+      { s: 'Moved product photos out of the model’s text', body: 'The model names what it recommends and the system attaches the real card and photo from the catalog, so a photo can’t be made up.' },
       { s: 'Cut the dashboard load from ~8.8 s to ~3.1 s', body: 'And the inbox from three database round-trips to one, with local token verification instead of a call to the auth provider on every request.' },
     ],
     tools: ['python', 'fastapi', 'langgraph', 'promptfoo', 'langfuse', 'langsmith', 'postgresql', 'pgvector', 'mongodb', 'redis', 'rabbitmq', 'angular'],
