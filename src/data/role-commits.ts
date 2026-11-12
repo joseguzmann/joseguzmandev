@@ -10,14 +10,15 @@ export const roleCommits: Record<string, RoleCommits> = {
   'Dynecron|Lead Software Engineer · part-time': {
     // Opción combinada de previews/job-lines (elegida por Jose el 2026-10-13).
     summary: 'Software company I co-founded and run part-time alongside my full-time roles, building custom business systems for clients in Ecuador. I run projects end to end, from the first meeting to deployment, and share the technical lead on each one with another senior engineer.',
+    // 2026-11-12: alineado con el CV v4 (jurado adversarial, career-os analysis/2026-11-12-jurado-dynecron-cv.md).
+    // Fuera La Milésima y Clear AI (no son de Jose) y el "Co-built".
     commits: [
-      { s: 'Co-built the system an engine workshop has run on since July 2025', body: '971 work orders and ~USD 433,000 invoiced through it. I worked on it from the contract to the Docker deploy.' },
-      { s: 'Co-built the operations platform a freight forwarder runs daily', body: 'Nine people ran 324 shipments on it in its first ~2.5 months. Shipment data is pulled from PDFs with AI.' },
-      { s: 'Co-built a multi-company ERP with electronic tax invoicing', body: '~30 modules and 175+ tables for an automotive service company. I carried more of the front end and shared the backend.' },
-      { s: 'Co-built a RAG checker for public procurement documents', body: 'The legal corpus is versioned, so any past analysis can be reproduced. Each LLM call is stored with its tokens and latency.' },
+      { s: 'Mapped an ERP’s work orders with the client in BPM sessions', body: 'A multi-company ERP for auto repair workshops on FastAPI, Next.js and PostgreSQL, with e-invoicing to Ecuador’s tax authority. I turned the process into the work-order rules, isolated each company’s data with Postgres Row Level Security and built the e-invoicing retry engine.' },
+      { s: 'Worked full stack on a freight forwarder’s operations platform', body: 'Its 9-person team runs shipments, tracking, documents and billing on it daily. I gathered requirements through an in-person MVP and built screens, client reports and Excel exports, backend business rules and CI/CD.' },
+      { s: 'Logged operators’ corrections to LLM-prefilled forms', body: 'Each time an operator saves a document, the fields the LLM filled are compared with what the operator kept, and the difference is stored as eval data.' },
       { s: 'Took clients from first meeting to signed contract', body: 'Requirements, NDAs and SLAs, and almost a year of negotiation on the largest one.' },
     ],
-    tools: ['python', 'fastapi', 'postgresql', 'pgvector', 'next', 'react', 'reactnative', 'docker', 'githubactions'],
+    tools: ['python', 'fastapi', 'postgresql', 'next', 'react', 'docker', 'githubactions'],
   },
   'Agents Booster|AI Engineer · contract': {
     // Opción 1 de previews/role-lines (elegida por Jose el 2026-10-13): cada línea es algo que él hizo.

@@ -10,17 +10,8 @@ export const kit = {
   ctaHref: 'https://www.linkedin.com/in/joseguzmann/',
   /** Reenvía al correo personal de Jose (alias en Namecheap; jurado del 2026-10-13 eligió hi@). */
   email: 'hi@joseguzman.dev',
+  // 2026-11-12: fuera La Milésima (no es de Jose), alineado con el CV v4.
   work: [
-    {
-      name: 'La Milésima',
-      logo: { src: '/systems/la-milesima.png', bg: '#000000' },
-      title: 'The system an engine shop runs its front desk on',
-      kind: 'Vehicle workshop · management system',
-      figure: { value: '~$433k', label: 'USD invoiced through it' },
-      status: 'running since Jul 2025',
-      live: true,
-      href: '/work/workshop-system/',
-    },
     {
       name: 'InnovoX',
       logo: { src: '/systems/innovox.png', bg: '#1a3b2f' },
@@ -38,7 +29,7 @@ export const kit = {
       logo: { src: '/systems/fwize.svg', bg: '#ffffff' },
       title: 'Multi-company ERP for an automotive service company',
       kind: 'Automotive services · ERP with electronic invoicing',
-      figure: { value: '1,886', label: 'backend tests, plus 272 e2e specs' },
+      figure: { value: '~30', label: 'modules, 175+ tables' },
       status: 'in beta',
       live: false,
       beta: true,
@@ -100,10 +91,10 @@ export type Highlight = { title: string; detail: string; figure?: string; href?:
 // Clave: "org|role" de kit.experience.
 export const highlights: Record<string, Highlight[]> = {
   'Dynecron|Lead Software Engineer · part-time': [
-    { title: 'Workshop management system', detail: 'Running since Jul 2025, later a white-label product', figure: '971 work orders', href: '/work/workshop-system/' },
-    { title: 'Freight forwarder operations platform', detail: 'Nine people run their day on it', figure: '324 shipments', href: '/work/freight-operations/' },
-    { title: 'Multi-company ERP with e-invoicing', detail: 'Onboarding its first company', figure: '1,886 backend tests', href: '/work/multi-company-erp/' },
-    { title: 'Auditable RAG over procurement law', detail: 'Versioned legal corpus, any analysis can be replayed', href: '/work/procurement-rag/' },
+    { title: 'Multi-company ERP with e-invoicing', detail: 'Work-order rules from BPM sessions, Row Level Security, e-invoicing retries', href: '/work/multi-company-erp/' },
+    { title: 'Freight forwarder operations platform', detail: 'Full stack; nine people run their day on it', figure: '324 shipments', href: '/work/freight-operations/' },
+    { title: 'Eval data from LLM-prefilled forms', detail: 'Operators’ corrections logged field by field' },
+    { title: 'Clients from first meeting to contract', detail: 'Requirements, NDAs and SLAs' },
   ],
   'Agents Booster|AI Engineer · contract': [
     { title: 'Grounding layer for an LLM sales agent', detail: 'Every claim checked against the live catalog', href: '/work/llm-agent-reliability/' },
